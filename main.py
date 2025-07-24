@@ -1,5 +1,6 @@
-from flask import Flask, request, template, redirect, url_for, session,flash
+from flask import Flask, request, redirect, url_for, session,flash
 from flask_sqlalchemy import SQLAlchemy
+from flask_restful import Api, Resource, reqparse, fields, marshal_with, marshal
 
 import os 
 from datetime import datetime
@@ -64,7 +65,7 @@ class parking_lot(db.Model):
 class parking_spot(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     is_occupied = db.Column(db.Boolean, default=False)
-    parking_cost = db.Column(db.Float, nullable=False default=-1.0)
+    parking_cost = db.Column(db.Float, nullable=False, default=-1.0)
     lot_id = db.Column(db.Integer, db.ForeignKey('parking_lot.id'), nullable=False)
     spot_type = db.Column(db.Enum(SpotType), default=SpotType.REGULAR)
 
@@ -86,10 +87,7 @@ class booking(db.Model):
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.Enum(BookingStatus), default=BookingStatus.ACTIVE)  
     total_cost = db.Column(db.Float, nullable=False)
-    user = db.relationship('User', backref='bookings')
-    parking_spot = db.relationship('parking_spot', backref='bookings')
-
-
+   
     def __repr__(self):
         return f"Booking(User ID: {self.user_id}, Spot ID: {self.spot_id}, Start: {self.start_time}, End: {self.end_time})"
 
@@ -109,11 +107,134 @@ class Review(db.Model):
         return f"Review(User ID: {self.user_id}, Lot ID: {self.lot_id}, Rating: {self.rating})"
 
 # =======================================================
-#============== Routes ==================================
+#============== API ==================================
 # =======================================================   
+api = Api(app)
+class UserResource(Resource):
+    def get(self):
+        user = User.query.all()
+        # if not user:
+        #     return {'message': 'User not found'}, 404
+        return {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'is_admin': user.is_admin
+        }
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', required=True, help='Username cannot be blank')
+        parser.add_argument('password', required=True, help='Password cannot be blank')
+        parser.add_argument('email', required=True, help='Email cannot be blank')
+        args = parser.parse_args()
+
+        new_user = User(username=args['username'], password=args['password'], email=args['email'])
+        db.session.add(new_user)
+        db.session.commit()
+        return {'message': 'User created successfully'}, 201
+class ParkingLotResource(Resource):
+    def get(self, lot_id):
+        lot = parking_lot.query.get_or_404(lot_id)
+        return {
+            'id': lot.id,
+            'prime_location_name': lot.prime_location_name,
+            'address': lot.address,
+            'pin_code': lot.pin_code,
+            'total_spots': lot.total_spots,
+            'available_spots': lot.available_spots
+        }
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('prime_location_name', required=True, help='Location name cannot be blank')
+        parser.add_argument('address', required=True, help='Address cannot be blank')
+        parser.add_argument('pin_code', type=int, required=True, help='Pin code cannot be blank')
+        parser.add_argument('total_spots', type=int, required=True, help='Total spots cannot be blank')
+        args = parser.parse_args()
+
+        new_lot = parking_lot(
+            prime_location_name=args['prime_location_name'],
+            address=args['address'],
+            pin_code=args['pin_code'],
+            total_spots=args['total_spots'],
+            available_spots=args['total_spots']  # Initially all spots are available
+        )
+        db.session.add(new_lot)
+        db.session.commit()
+        return {'message': 'Parking lot created successfully'}, 201
+class ParkingSpotResource(Resource):
+    def get(self, spot_id):
+        spot = parking_spot.query.get_or_404(spot_id)
+        return {
+            'id': spot.id,
+            'is_occupied': spot.is_occupied,
+            'parking_cost': spot.parking_cost,
+            'lot_id': spot.lot_id,
+            'spot_type': spot.spot_type.value
+        }
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('lot_id', type=int, required=True, help='Parking lot ID cannot be blank')
+        parser.add_argument('parking_cost', type=float, required=True, help='Parking cost cannot be blank')
+        parser.add_argument('spot_type', type=str, choices=[e.value for e in SpotType], default=SpotType.REGULAR.value)
+        args = parser.parse_args()
+
+        new_spot = parking_spot(
+            lot_id=args['lot_id'],
+            parking_cost=args['parking_cost'],
+            spot_type=SpotType(args['spot_type'])
+        )
+        db.session.add(new_spot)
+        db.session.commit()
+        return {'message': 'Parking spot created successfully'}, 201
+class BookingResource(Resource):
+    def get(self, booking_id):
+        booking = booking.query.get_or_404(booking_id)
+        return {
+            'id': booking.id,
+            'user_id': booking.user_id,
+            'spot_id': booking.spot_id,
+            'vehicle_number': booking.vehicle_number,
+            'vehicle_type': booking.vehicle_type.value,
+            'start_time': booking.start_time.isoformat(),
+            'end_time': booking.end_time.isoformat(),
+            'status': booking.status.value,
+            'total_cost': booking.total_cost
+        }
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('user_id', type=int, required=True, help='User ID cannot be blank')
+        parser.add_argument('spot_id', type=int, required=True, help='Parking spot ID cannot be blank')
+        parser.add_argument('vehicle_number', required=True, help='Vehicle number cannot be blank')
+        parser.add_argument('vehicle_type', type=str, choices=[e.value for e in VehicleType], required=True)
+        parser.add_argument('end_time', type=str, required=True, help='End time cannot be blank')
+        args = parser.parse_args()
+
+        new_booking = booking(
+            user_id=args['user_id'],
+            spot_id=args['spot_id'],
+            vehicle_number=args['vehicle_number'],
+            vehicle_type=VehicleType(args['vehicle_type']),
+            end_time=datetime.fromisoformat(args['end_time']),
+            total_cost=0.0  # Placeholder for cost calculation
+        )
+        db.session.add(new_booking)
+        db.session.commit()
+        return {'message': 'Booking created successfully'}, 201 
+api.add_resource(UserResource, '/users/', '/users')
+api.add_resource(ParkingLotResource, '/parking_lots/<int:lot_id>', '/parking_lots')
+api.add_resource(ParkingSpotResource, '/parking_spots/<int:spot_id>', '/parking_spots')
+api.add_resource(BookingResource, '/bookings/<int:booking_id>', '/bookings')    
+# =======================================================
+#============== Routes =================================
 @app.route('/')
 def index():
     return "Welcome to the Parking Management System!"
 
 if __name__ == '__main__':
+    
+    
     app.run(debug=True)
