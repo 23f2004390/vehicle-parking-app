@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, session,flash
+from flask import Flask, request, redirect, url_for, session,flash,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, fields, marshal_with, marshal
 
@@ -115,13 +115,17 @@ class UserResource(Resource):
         user = User.query.all()
         # if not user:
         #     return {'message': 'User not found'}, 404
-        return {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'is_admin': user.is_admin
-        }
+        return [self.serialize_user(u) for u in user]
 
+    def serialize_user(self, u):
+        return {
+            'id': u.id,
+            'username': u.username,
+            'email': u.email,
+            'is_admin': u.is_admin,
+            'created_at': u.created_at.isoformat()
+        }
+    
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('username', required=True, help='Username cannot be blank')
@@ -235,6 +239,8 @@ def index():
     return "Welcome to the Parking Management System!"
 
 if __name__ == '__main__':
-    
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
     
     app.run(debug=True)
