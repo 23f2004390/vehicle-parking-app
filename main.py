@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, session,flash,jsonify
+from flask import Flask, request, redirect, url_for, session,flash,jsonify, render_template, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, fields, marshal_with, marshal
 
@@ -17,7 +17,6 @@ db = SQLAlchemy(app)
 #============== Models =================================
 # =======================================================
 import enum
-
 class SpotType(enum.Enum):
     REGULAR = 'regular'
     ELECTRIC = 'electric'
@@ -108,7 +107,7 @@ class Review(db.Model):
 
 @app.route('/')
 def index():
-    return "Welcome to the Parking Management System!"
+    return render_template('landing.html')
 
 if __name__ == '__main__':
     with app.app_context():
