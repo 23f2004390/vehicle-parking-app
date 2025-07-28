@@ -13,6 +13,18 @@
 </head>
 <body>
     <div class="main" id="home">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-overlay" onclick="this.remove()">
+                    <div class="flash-message flash-{{ category }}" onclick="event.stopPropagation()">
+                        <p>{{ message }}</p>
+                        <button class="login-btn" onclick="this.closest('.flash-overlay').remove()">OK</button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
         <div class="nav" >
             <h1>vehicle parking app</h1>
             <div class="nav-links">
@@ -23,7 +35,7 @@
             </div>
             <div class="auth">
                 <a href="/login"><i class="ri-login-box-fill"></i>Login</a>
-                <a href="/register"><i class="ri-registered-fill"></i>Register</a>
+                <!-- <a href="/register"><i class="ri-registered-fill"></i>Register</a> -->
             </div>
         </div>
         <div class="landing-area">
@@ -38,10 +50,10 @@
                 <form action="/login" method="post">
                     <input type="text" name="username" placeholder="Username" required>
                     <input type="password" name="password" placeholder="Password" required>
-                    <p class="remember">
+                    <!-- <p class="remember">
                         <input type="checkbox" name="remember" id="remember">
                         <label for="remember">Remember Me</label>
-                    </p>
+                    </p> -->
                     
                     <button type="submit">Login</button>
                 </form>
@@ -78,7 +90,7 @@
             </div>
             <div class="auth">
                 <a href="/login">Login</a>
-                <a href="/register">Register</a>
+                <!-- <a href="/register">Register</a> -->
             </div>
         </div>
     </div>
@@ -103,7 +115,7 @@
             </div>
             <div class="auth">
                 <a href="/login">Login</a>
-                <a href="/register">Register</a>
+                <!-- <a href="/register">Register</a> -->
             </div>
         </div>
     </div>
@@ -138,7 +150,7 @@
             </div>
             <div class="auth">
                 <a href="/login">Login</a>
-                <a href="/register">Register</a>
+                <!-- <a href="/register">Register</a> -->
             </div>
         </div>
         <div class="contact" id="contact">

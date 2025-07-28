@@ -21,24 +21,24 @@ passwordInput.addEventListener('keydown', function (e) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById("login-form");
-    const registerForm = document.getElementById("register-form");
+const loginForm = document.getElementById("login-form");
+const registerForm = document.getElementById("register-form");
 
-    const showRegisterBtn = document.getElementById("show-register");
-    if (showRegisterBtn && loginForm && registerForm) {
-        showRegisterBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            loginForm.style.display = "none";
-            registerForm.style.display = "block";
-        });
-    }
+const showRegisterBtn = document.getElementById("show-register");
+if (showRegisterBtn && loginForm && registerForm) {
+    showRegisterBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        loginForm.style.display = "none";
+        registerForm.style.display = "block";
+    });
+}
 
-    const showLoginBtn = document.getElementById("show-login");
-    if (showLoginBtn && loginForm && registerForm) {
-        showLoginBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            registerForm.style.display = "none";
-            loginForm.style.display = "flex";
-        });
-    }
+const showLoginBtn = document.getElementById("show-login");
+if (showLoginBtn && loginForm && registerForm) {
+    showLoginBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        registerForm.style.display = "none";
+        loginForm.style.display = "flex";
+    });
+}
 });
