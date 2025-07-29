@@ -11,23 +11,34 @@
 
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-overlay" onclick="this.remove()">
+                    <div class="flash-message flash-{{ category }}" onclick="event.stopPropagation()">
+                        <p>{{ message }}</p>
+                        <button class="login-btn" onclick="this.closest('.flash-overlay').remove()">OK</button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
     <div class="container">
-        <div class="sidebar">
+        
+        <div class="sidebar" >
             <div class="profile">
                 <h1 style="border-bottom: 1px solid #d3caca81;">  Admin</h1>
             </div>
             <div class="nav">
                 <nav class="nav-item"><a href="#dashboard" class="active">📊 Dashboard</a></nav>
-                <div class="nav-item"><a href="#parking_lots" class="active">🅿️ Parking Lots</a></div>
-                <div class="nav-item"><a href="#users" class="active">🙎 User</a></div>
-                <div class="nav-item"><a href="#activity" class="active">📒Activity</a></div>
+                <div class="nav-item"><a href="#search-section" class="active">🅿️ Parking Lots</a></div>
+                <div class="nav-item"><a href="javascript:void(0)" onclick="openUsersPopup()" class="active">🙎 User</a></div>
+                <div class="nav-item"><a href="javascript:void(0)" onclick="openBookingPopup()" class="active">📋 Bookings</a></div>
                 <div class="nav-item"><a href="#summary" class="active">📈Summary</a></div>
                 <div class="nav-item"><a href="/logout" class="active"><i class="ri-login-box-fill" style="font-size: 2rem;"></i>Logout</a></div>
             </div>
-
-
         </div>
-        <div class="main">
+        <div class="main" id="dashboard">
             <div class="header">
                 <div class="title">
                 <h1>Admin Dashboard </h1>
@@ -38,26 +49,921 @@
                 </div>
             </div>
             <div class="four-row">
-                <!-- here i have to use jinja to do loop -->
                 <div class="row-card">
+                    <div class="card-header">
+                        <div class="card-title">Total Parking Lots</div>
+                        <div class="card-icon">🅿️</div>
+                    </div>
+                    <div class="card-value">247</div>
+                    <div class="card-change change-positive">
+                        <i class="ri-arrow-up-line"></i>
+                        +12% from last month
+                    </div>
+                </div>
+
+                <div class="row-card">
+                    <div class="card-header">
+                        <div class="card-title">Active Users</div>
+                        <div class="card-icon">👥</div>
+                    </div>
+                    <div class="card-value">1,894</div>
+                    <div class="card-change change-positive">
+                        <i class="ri-arrow-up-line"></i>
+                        +8.2% from last month
+                    </div>
+                </div>
+
+                <div class="row-card">
+                    <div class="card-header">
+                        <div class="card-title">Total Revenue</div>
+                        <div class="card-icon">💰</div>
+                    </div>
+                    <div class="card-value">₹89,450</div>
+                    <div class="card-change change-positive">
+                        <i class="ri-arrow-up-line"></i>
+                        +15.3% from last month
+                    </div>
+                </div>
+
+                <div class="row-card">
+                    <div class="card-header">
+                        <div class="card-title">Occupancy Rate</div>
+                        <div class="card-icon">📊</div>
+                    </div>
+                    <div class="card-value">72%</div>
+                    <div class="card-change change-negative">
+                        <i class="ri-arrow-down-line"></i>
+                        -2.1% from last month
+                    </div>
                 </div>
             </div>
+
             <div class="content">
                 <div class="left_column">
                     <!-- we can use jinja to show multiple line of content -->
                     <div class="card">
-
+                        <h3>Recent Bookings</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Parking Lot</th>
+                                        <th>Duration</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>USR001</td>
+                                        <td>Velachery Central</td>
+                                        <td>2.5 hrs</td>
+                                        <td>₹150</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>USR002</td>
+                                        <td>T. Nagar Plaza</td>
+                                        <td>4 hrs</td>
+                                        <td>₹240</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>USR003</td>
+                                        <td>Anna Nagar Mall</td>
+                                        <td>1.5 hrs</td>
+                                        <td>₹90</td>
+                                        <td><span class="status-badge status-inactive">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>USR004</td>
+                                        <td>Porur IT Park</td>
+                                        <td>8 hrs</td>
+                                        <td>₹480</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Users info</h3>
+                        <div class="user">
+                            <div class="user-info">
+                                <p><strong>User ID:</strong> USR001</p>
+                                <p><strong>Name:</strong> John Doe</p>
+                                <p><strong>Email:</strong> 2T7Fp@example.com</p>
+                            </div>
+                            <div class="user-actions">
+                                <button class="action-btn" onclick="openUserEditPopup('USR001', 'John Doe', '2T7Fp@example.com', '123-456-7890')">Edit</button>
+                                <button class="action-btn">Delete</button>
+                            </div>
+                        </div>
+                        <div class="user">
+                            <div class="user-info">
+                                <p><strong>User ID:</strong> USR002</p>
+                                <p><strong>Name:</strong> Jane Smith</p>
+                                <p><strong>Email:</strong> 9GZc4@example.com</p>
+                            </div>
+                            <div class="user-actions">
+                                <button class="action-btn" onclick="openUserEditPopup('USR002', 'Jane Smith', '9GZc4@example.com', '987-654-3210')">Edit</button>
+                                <button class="action-btn">Delete</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="right_column">
                     <!-- we have to use jinja2 -->
                     <div class="card">
+                        <h3>Parking Lot Performance</h3>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Velachery Central</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>T. Nagar Plaza</span>
+                                <span>92%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Anna Nagar Mall</span>
+                                <span>78%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Porur IT Park</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 95%"></div>
+                            </div>
+                        </div>
 
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-number">4.2</div>
+                                <div class="stat-label">Avg Rating</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number">128</div>
+                                <div class="stat-label">Today's Bookings</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Summary</h3>
+                        <div class="summary-item">
+                            <div class="summary-header">
+                                <span>Total Revenue</span>
+                                <span>₹89,450</span>
+                            </div>
+                            <div class="summary-bar">
+                                <div class="summary-fill" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-header">
+                                <span>Total Bookings</span>
+                                <span>128</span>
+                            </div>
+                            <div class="summary-bar">
+                                <div class="summary-fill" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="line_chart">
+                            <canvas id="myChart">
+                                <!-- Chart.js will render the chart here -->
+                                
+                            </canvas>
+
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="parking_lots" id="parking_lots"></div>
+    <div class="container-search" id="search-section">
+        <!-- Search Section -->
+        <div class="search-container">
+            <h2 class="search-title">Search Parking Lots</h2>
+            <div class="search-controls">
+                <select class="search-dropdown" id="searchBy">
+                    <option value="location">Search by Location</option>
+                    <option value="user_id">Search by User ID</option>
+                    <option value="lot_name">Search by Lot Name</option>
+                </select>
+                <input type="text" class="search-input" id="searchInput" placeholder=" search . . .">
+                <button class="create-lot-btn" onclick="openCreateLotPopup()">
+                    <i class="ri-add-line"></i> Create New Lot
+                </button>
+
+            </div>
+            <div class="example-text">
+                Example: Search parking lots by location, user ID, or lot name. e.g. "cityname like chennai", "user123", "Parking #12"
+            </div>
+        </div>
+
+
+
+        <!-- Search Results Section -->
+        <div class="results-grid" id="resultsGrid">
+                <!-- Parking Lot 1 -->
+                <div class="parking-lot-card" data-location="velachery" data-name="velachery central">
+                    <div class="lot-header">
+                        <div class="lot-title">Parking #12</div>
+                        <div class="lot-actions">
+                            <button class="action-btn" onclick="openLotEditPopup('LOT001', 'Parking #12', 'Velachery Central', 10, 3)">Edit</button>
+                            <button class="action-btn">Delete</button>
+                        </div>
+                    </div>
+                    <div class="lot-info">
+                        <p><strong>Location:</strong> Velachery Central</p>
+                        <p><strong>Occupied:</strong> 3/10 spaces</p>
+                    </div>
+                    <div class="occupancy-bar">
+                        <div class="occupancy-fill" style="width: 30%"></div>
+                    </div>
+                    <div class="spots-preview">
+                        <div class="spot available">A1</div>
+                        <div class="spot occupied">B1</div>
+                        <div class="spot available">A2</div>
+                        <div class="spot available">A3</div>
+                        <div class="spot available">A4</div>
+                        <div class="spot available">B2</div>
+                        <div class="spot available">A5</div>
+                        <div class="spot occupied">B3</div>
+                        <div class="spot available">A6</div>
+                        <div class="spot occupied">B4</div>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+<!-- ----------------------------------- -->
+    <div class="container-summary" id="summary">
+        <h2>Summary</h2>
+        <p>Total Parking Lots: 247</p>
+        <p>Total Users: 1,894</p>
+        <p>Total Revenue: ₹89,450</p>
+    </div>
+    <footer>
+        <p>&copy; {{ year|default(2025) }} Parking Management System</p>
+    </footer>
+<!-- ----------------------------form-------------- -->
+<!-- User Edit  Popup --->
+<div class="popup-overlay" id="userEditPopup">
+    <div class="popup-form">
+        <h3>Edit User</h3>
+        <form id="userEditForm" method="POST" action="/user_edit">
+            <input type="hidden" id="editUserId" name="user_id">
+            
+            <div class="form-group">
+                <label for="editUserName">Name:</label>
+                <input type="text" id="editUserName" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editUserEmail">Email:</label>
+                <input type="email" id="editUserEmail" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editUserPhone">Phone:</label>
+                <input type="tel" id="editUserPhone" name="phone">
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn">Update User</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('userEditPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-------- Parking  Lot Edit Popup -->
+<div class="popup-overlay" id="lotEditPopup">
+    <div class="popup-form">
+        <h3>Edit Parking Lot</h3>
+        <form id="lotEditForm" method="POST" action="/lot_edit">
+            <input type="hidden" id="editLotId" name="lot_id">
+            
+            <div class="form-group">
+                <label for="editLotName">Lot Name:</label>
+                <input type="text" id="editLotName" name="lot_name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editLotLocation">Location:</label>
+                <input type="text" id="editLotLocation" name="location" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editTotalSpaces">Total Spaces:</label>
+                <input type="number" id="editTotalSpaces" name="total_spaces" min="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editOccupiedSpaces">Occupied Spaces:</label>
+                <input type="number" id="editOccupiedSpaces" name="occupied_spaces" min="0" required>
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn">Update Lot</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('lotEditPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Create Parking Lot Popup -->
+<div class="popup-overlay" id="createLotPopup">
+    <div class="popup-form">
+        <h3>Create New Parking Lot</h3>
+        <form id="createLotForm" method="POST" action="/lot_create">
+            
+            <div class="form-group">
+                <label for="createLotName">Lot Name:</label>
+                <input type="text" id="createLotName" name="lot_name" placeholder="e.g., Parking #13" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="createLotLocation">Location:</label>
+                <input type="text" id="createLotLocation" name="location" placeholder="e.g., Velachery Central" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="createTotalSpaces">Total Spaces:</label>
+                <input type="number" id="createTotalSpaces" name="total_spaces" min="1" max="100" placeholder="10" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="createPricePerHour">Price per Hour (₹):</label>
+                <input type="number" id="createPricePerHour" name="price_per_hour" min="10" step="10" placeholder="60" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="createDescription">Description (Optional):</label>
+                <input type="text" id="createDescription" name="description" placeholder="Additional details about the parking lot">
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn">Create Parking Lot</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('createLotPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Users Management Popup -->
+<div class="popup-overlay" id="usersPopup">
+    <div class="users-popup-content">
+        <div class="users-popup-header">
+            <h2>🙎 Users Management</h2>
+            <button class="close-popup-btn" onclick="closeUsersPopup()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        
+        <div class="users-popup-body">
+            <!-- User Controls Section -->
+            <div class="user-controls">
+                <div class="user-actions-bar">
+                    <div class="user-search">
+                        <select class="search-dropdown" id="userSearchBy">
+                            <option value="name">Search by Name</option>
+                            <option value="email">Search by Email</option>
+                            <option value="user_id">Search by User ID</option>
+                        </select>
+                        <input type="text" class="search-input" id="userSearchInput" placeholder="Search users...">
+                    </div>
+                    <button class="create-user-btn" onclick="openCreateUserPopup()">
+                        <i class="ri-user-add-line"></i> Create New User
+                    </button>
+                </div>
+            </div>
+
+            <!-- Users Grid -->
+            <div class="user-list" id="userGrid">
+                <div class="user-card" data-name="john doe" data-email="ht5wv@example.com" data-userid="usr001">
+                    <div class="user-header">
+                        <span class="user-name">John Doe</span>
+                        <span class="user-id">USR001</span>
+                    </div>
+                    <div class="user-info">
+                        <p>Email: <span class="user-email">Ht5WV@example.com</span></p>
+                        <p>Phone: <span class="user-phone">123-456-7890</span></p>
+                    </div>
+                    <div class="user-actions">
+                        <button class="action-btn" onclick="openUserEditPopup('USR001', 'John Doe', 'Ht5WV@example.com', '123-456-7890')">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteUser('USR001', 'John Doe')">Delete</button>
+                    </div>
+                </div>
+
+                <div class="user-card" data-name="jane smith" data-email="9gzc4@example.com" data-userid="usr002">
+                    <div class="user-header">
+                        <span class="user-name">Jane Smith</span>
+                        <span class="user-id">USR002</span>
+                    </div>
+                    <div class="user-info">
+                        <p>Email: <span class="user-email">9GZc4@example.com</span></p>
+                        <p>Phone: <span class="user-phone">987-654-3210</span></p>
+                    </div>
+                    <div class="user-actions">
+                        <button class="action-btn" onclick="openUserEditPopup('USR002', 'Jane Smith', '9GZc4@example.com', '987-654-3210')">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteUser('USR002', 'Jane Smith')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create User Popup -->
+<div class="popup-overlay" id="createUserPopup">
+    <div class="popup-form">
+        <h3>Create New User</h3>
+        <form id="createUserForm" method="POST" action="/user_create">
+            <div class="form-group">
+                <label for="createUserName">Full Name:</label>
+                <input type="text" id="createUserName" name="name" placeholder="e.g., John Doe" required>
+            </div>
+            <div class="form-group">
+                <label for="createUserEmail">Email:</label>
+                <input type="email" id="createUserEmail" name="email" placeholder="john@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="createUserPhone">Phone Number:</label>
+                <input type="tel" id="createUserPhone" name="phone" placeholder="+91 9876543210" required>
+            </div>
+            <div class="form-group">
+                <label for="createUserPassword">Password:</label>
+                <input type="password" id="createUserPassword" name="password" placeholder="Enter password" required>
+            </div>
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn">Create User</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('createUserPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete User Confirmation Popup -->
+<div class="popup-overlay" id="deleteUserPopup">
+    <div class="popup-form">
+        <h3>Delete User</h3>
+        <form id="deleteUserForm" method="POST" action="/user_delete">
+            <input type="hidden" id="deleteUserId" name="user_id">
+            <div class="delete-warning">
+                <i class="ri-alert-line" style="font-size: 3rem; color: #dc3545; margin-bottom: 15px;"></i>
+                <p>Are you sure you want to delete user <strong id="deleteUserName"></strong>?</p>
+                <p style="color: #dc3545; font-size: 0.9rem;">This action cannot be undone.</p>
+            </div>
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn" style="background: #dc3545;">Delete User</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('deleteUserPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Booking Management Popup -->
+<div class="popup-overlay" id="bookingPopup">
+    <div class="booking-popup-content">
+        <div class="booking-popup-header">
+            <h2>📋 Booking Management</h2>
+            <button class="close-popup-btn" onclick="closeBookingPopup()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        
+        <div class="booking-popup-body">
+            <!-- Booking Controls Section -->
+            <div class="booking-controls">
+                <div class="booking-actions-bar">
+                    <div class="booking-search">
+                        <select class="search-dropdown" id="bookingSearchBy">
+                            <option value="all">All Bookings</option>
+                            <option value="active">Active Bookings</option>
+                            <option value="completed">Completed Bookings</option>
+                            <option value="cancelled">Cancelled Bookings</option>
+                        </select>
+                        <input type="text" class="search-input" id="bookingSearchInput" placeholder="Search by user ID, lot name...">
+                    </div>
+                    <button class="create-user-btn" onclick="openCreateBookingPopup()">
+                        <i class="ri-add-line"></i> Create New Booking
+                    </button>
+                </div>
+            </div>
+
+            <!-- Booking Stats -->
+            <div class="booking-stats">
+                <div class="stat-card">
+                    <div class="stat-number">128</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">45</div>
+                    <div class="stat-label">Active Now</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">₹12,450</div>
+                    <div class="stat-label">Today's Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">83</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+            </div>
+
+            <!-- Booking List -->
+            <div class="booking-list" id="bookingGrid">
+                <div class="booking-card" data-status="active" data-user="usr001" data-lot="velachery central">
+                    <div class="booking-header">
+                        <span class="booking-id">BK001</span>
+                        <span class="booking-status status-active">Active</span>
+                    </div>
+                    <div class="booking-info">
+                        <p><strong>User:</strong> USR001 - John Doe</p>
+                        <p><strong>Parking Lot:</strong> Velachery Central - Spot A1</p>
+                        <p><strong>Duration:</strong> 2.5 hrs (Started: 10:30 AM)</p>
+                        <p><strong>Amount:</strong> ₹150</p>
+                        <p><strong>Phone:</strong> +91 9876543210</p>
+                    </div>
+                    <div class="booking-actions">
+                        <button class="action-btn" onclick="editBooking('BK001')">Edit</button>
+                        <button class="action-btn" onclick="completeBooking('BK001')">Complete</button>
+                        <button class="action-btn delete-btn" onclick="cancelBooking('BK001')">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="booking-card" data-status="active" data-user="usr002" data-lot="t nagar plaza">
+                    <div class="booking-header">
+                        <span class="booking-id">BK002</span>
+                        <span class="booking-status status-active">Active</span>
+                    </div>
+                    <div class="booking-info">
+                        <p><strong>User:</strong> USR002 - Jane Smith</p>
+                        <p><strong>Parking Lot:</strong> T. Nagar Plaza - Spot B3</p>
+                        <p><strong>Duration:</strong> 4 hrs (Started: 11:15 AM)</p>
+                        <p><strong>Amount:</strong> ₹240</p>
+                        <p><strong>Phone:</strong> +91 9876543211</p>
+                    </div>
+                    <div class="booking-actions">
+                        <button class="action-btn" onclick="editBooking('BK002')">Edit</button>
+                        <button class="action-btn" onclick="completeBooking('BK002')">Complete</button>
+                        <button class="action-btn delete-btn" onclick="cancelBooking('BK002')">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="booking-card" data-status="completed" data-user="usr003" data-lot="anna nagar mall">
+                    <div class="booking-header">
+                        <span class="booking-id">BK003</span>
+                        <span class="booking-status status-completed">Completed</span>
+                    </div>
+                    <div class="booking-info">
+                        <p><strong>User:</strong> USR003 - Mike Johnson</p>
+                        <p><strong>Parking Lot:</strong> Anna Nagar Mall - Spot C2</p>
+                        <p><strong>Duration:</strong> 1.5 hrs (Completed: 1:30 PM)</p>
+                        <p><strong>Amount:</strong> ₹90</p>
+                        <p><strong>Phone:</strong> +91 9876543212</p>
+                    </div>
+                    <div class="booking-actions">
+                        <button class="action-btn" onclick="viewBookingDetails('BK003')">View Details</button>
+                        <button class="action-btn delete-btn" onclick="deleteBooking('BK003')">Delete</button>
+                    </div>
+                </div>
+
+                <div class="booking-card" data-status="cancelled" data-user="usr004" data-lot="porur it park">
+                    <div class="booking-header">
+                        <span class="booking-id">BK004</span>
+                        <span class="booking-status status-cancelled">Cancelled</span>
+                    </div>
+                    <div class="booking-info">
+                        <p><strong>User:</strong> USR004 - Sarah Wilson</p>
+                        <p><strong>Parking Lot:</strong> Porur IT Park - Spot D1</p>
+                        <p><strong>Duration:</strong> 3 hrs (Cancelled: 2:45 PM)</p>
+                        <p><strong>Amount:</strong> ₹0 (Refunded)</p>
+                        <p><strong>Phone:</strong> +91 9876543213</p>
+                    </div>
+                    <div class="booking-actions">
+                        <button class="action-btn" onclick="viewBookingDetails('BK004')">View Details</button>
+                        <button class="action-btn delete-btn" onclick="deleteBooking('BK004')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Booking Popup -->
+<div class="popup-overlay" id="createBookingPopup">
+    <div class="popup-form">
+        <h3>Create New Booking</h3>
+        <form id="createBookingForm" method="POST" action="/booking_create">
+            <div class="form-group">
+                <label for="createBookingUser">User ID:</label>
+                <input type="text" id="createBookingUser" name="user_id" placeholder="e.g., USR001" required>
+            </div>
+            <div class="form-group">
+                <label for="createBookingLot">Parking Lot:</label>
+                <select id="createBookingLot" name="lot_id" required>
+                    <option value="">Select Parking Lot</option>
+                    <option value="LOT001">Velachery Central</option>
+                    <option value="LOT002">T. Nagar Plaza</option>
+                    <option value="LOT003">Anna Nagar Mall</option>
+                    <option value="LOT004">Porur IT Park</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="createBookingSpot">Parking Spot:</label>
+                <input type="text" id="createBookingSpot" name="spot" placeholder="e.g., A1, B3" required>
+            </div>
+            <div class="form-group">
+                <label for="createBookingDuration">Duration (hours):</label>
+                <input type="number" id="createBookingDuration" name="duration" min="0.5" step="0.5" placeholder="2.5" required>
+            </div>
+            <div class="form-group">
+                <label for="createBookingAmount">Amount (₹):</label>
+                <input type="number" id="createBookingAmount" name="amount" min="10" placeholder="150" required>
+            </div>
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn">Create Booking</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('createBookingPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const searchBy = document.getElementById('searchBy').value;
+            const cards = document.querySelectorAll('.parking-lot-card');
+            
+            cards.forEach(card => {
+                let searchText = '';
+                if (searchBy === 'location') {
+                    searchText = card.dataset.location;
+                } else if (searchBy === 'lot_name') {
+                    searchText = card.dataset.name;
+                } else if (searchBy === 'user_id') {
+                    searchText = card.querySelector('.lot-title').textContent;
+                }
+                
+                if (searchText.includes(searchTerm) || searchTerm === '') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate progress bars on load
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+        });
+        // User Edit Functions
+        function openUserEditPopup(userId, name, email, phone) {
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editUserName').value = name;
+            document.getElementById('editUserEmail').value = email;
+            document.getElementById('editUserPhone').value = phone || '';
+            
+            document.getElementById('userEditPopup').classList.add('active');
+        }
+
+        // Parking Lot Edit Functions
+        function openLotEditPopup(lotId, lotName, location, totalSpaces, occupiedSpaces) {
+            document.getElementById('editLotId').value = lotId;
+            document.getElementById('editLotName').value = lotName;
+            document.getElementById('editLotLocation').value = location;
+            document.getElementById('editTotalSpaces').value = totalSpaces;
+            document.getElementById('editOccupiedSpaces').value = occupiedSpaces;
+            
+            document.getElementById('lotEditPopup').classList.add('active');
+        }
+
+        // Close popup function
+        function closePopup(popupId) {
+            document.getElementById(popupId).classList.remove('active');
+        }
+
+        // Close popup when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('popup-overlay')) {
+                e.target.classList.remove('active');
+            }
+        });
+        // Create Parking Lot Functions
+        function openCreateLotPopup() {
+            
+            document.getElementById('createLotForm').reset();
+
+    
+    document.getElementById('createLotPopup').classList.add('active');
+}
+
+document.getElementById('createLotForm').addEventListener('submit', function(e) {
+    // You can add validation here if needed
+    const totalSpaces = document.getElementById('createTotalSpaces').value;
+    const pricePerHour = document.getElementById('createPricePerHour').value;
+    
+    if (totalSpaces < 1) {
+        alert('Total spaces must be at least 1');
+        e.preventDefault();
+        return;
+    }
+    
+    if (pricePerHour < 10) {
+        alert('Price per hour must be at least ₹10');
+        e.preventDefault();
+        return;
+    }
+    
+    // Form will submit to /lot_create route
+});
+
+// Open Users Popup
+function openUsersPopup() {
+    document.getElementById('usersPopup').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Close Users Popup
+function closeUsersPopup() {
+    document.getElementById('usersPopup').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+// Create User Functions
+function openCreateUserPopup() {
+    document.getElementById('createUserForm').reset();
+    document.getElementById('createUserPopup').classList.add('active');
+}
+
+// Delete User Functions
+function deleteUser(userId, userName) {
+    document.getElementById('deleteUserId').value = userId;
+    document.getElementById('deleteUserName').textContent = userName;
+    document.getElementById('deleteUserPopup').classList.add('active');
+}
+
+// User Search Functionality
+document.getElementById('userSearchInput').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const searchBy = document.getElementById('userSearchBy').value;
+    const userCards = document.querySelectorAll('.user-card');
+    
+    userCards.forEach(card => {
+        let searchText = '';
+        if (searchBy === 'name') {
+            searchText = card.dataset.name;
+        } else if (searchBy === 'email') {
+            searchText = card.dataset.email;
+        } else if (searchBy === 'user_id') {
+            searchText = card.dataset.userid;
+        }
+        
+        if (searchText.includes(searchTerm) || searchTerm === '') {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+
+// Close popup when clicking outside content area
+document.getElementById('usersPopup').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeUsersPopup();
+    }
+});
+
+// Close popup with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('usersPopup').classList.contains('active')) {
+        closeUsersPopup();
+    }
+});
+// Open Booking Popup
+function openBookingPopup() {
+    document.getElementById('bookingPopup').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Close Booking Popup
+function closeBookingPopup() {
+    document.getElementById('bookingPopup').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+// Create Booking Functions
+function openCreateBookingPopup() {
+    document.getElementById('createBookingForm').reset();
+    document.getElementById('createBookingPopup').classList.add('active');
+}
+
+// Booking Action Functions
+function editBooking(bookingId) {
+    alert('Edit booking: ' + bookingId + '\n(This would open an edit form)');
+}
+
+function completeBooking(bookingId) {
+    if (confirm('Mark booking ' + bookingId + ' as completed?')) {
+        alert('Booking ' + bookingId + ' marked as completed!');
+        // Here you would update the booking status
+    }
+}
+
+function cancelBooking(bookingId) {
+    if (confirm('Cancel booking ' + bookingId + '? This will refund the user.')) {
+        alert('Booking ' + bookingId + ' cancelled and refund processed!');
+        // Here you would cancel the booking
+    }
+}
+
+function deleteBooking(bookingId) {
+    if (confirm('Delete booking ' + bookingId + '? This action cannot be undone.')) {
+        alert('Booking ' + bookingId + ' deleted!');
+        // Here you would delete the booking record
+    }
+}
+
+function viewBookingDetails(bookingId) {
+    alert('Viewing details for booking: ' + bookingId + '\n(This would open a detailed view)');
+}
+
+// Booking Search Functionality
+document.getElementById('bookingSearchInput').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const statusFilter = document.getElementById('bookingSearchBy').value;
+    const bookingCards = document.querySelectorAll('.booking-card');
+    
+    bookingCards.forEach(card => {
+        let shouldShow = false;
+        
+        // Filter by status
+        if (statusFilter === 'all') {
+            shouldShow = true;
+        } else {
+            shouldShow = card.dataset.status === statusFilter;
+        }
+        
+        // Filter by search term
+        if (shouldShow && searchTerm !== '') {
+            const cardText = card.textContent.toLowerCase();
+            shouldShow = cardText.includes(searchTerm);
+        }
+        
+        card.style.display = shouldShow ? 'block' : 'none';
+    });
+});
+
+// Close booking popup when clicking outside content area
+document.getElementById('bookingPopup').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeBookingPopup();
+    }
+});
+
+// Close booking popup with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('bookingPopup').classList.contains('active')) {
+        closeBookingPopup();
+    }
+});
+        // // Toggle between available and occupied spots
+        // document.querySelectorAll('.spot').forEach(spot => {
+        //     spot.addEventListener('click', function() {
+        //         if (this.classList.contains('available')) {
+        //             this.classList.remove('available');
+        //             this.classList.add('occupied');
+        //         } else {
+        //             this.classList.remove('occupied');
+        //             this.classList.add('available');
+        //         }
+        //     });
+        // });
+</script>
 </body>
 </html>

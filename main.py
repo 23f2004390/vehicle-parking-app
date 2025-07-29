@@ -113,10 +113,12 @@ class Review(db.Model):
 #============== Routes ==================================
 # =======================================================
 
+
+
 @app.route('/')
 def index():
     return render_template('landing.html')
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -128,7 +130,7 @@ def login():
             session['username'] = user.username
             session['is_admin'] = user.is_admin
             flash('Login successful!', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('user_dashboard') if not user.is_admin else url_for('admin_dashboard'))
         else:
             flash('Invalid credentials. Please try again.', 'danger')
             return redirect(url_for('index'))
@@ -161,17 +163,22 @@ def register():
         return redirect(url_for('index'))
     return render_template('landing.html')
 
-@app.route('/admin',methods=['GET','POST'])
+@app.route('/admin_dashboard',methods=['GET','POST'])
 def admin_dashboard():
+    if 'is_admin' not in session or not session['is_admin']:
+        flash('Access denied. Admins only.', 'danger')
+        return redirect(url_for('index'))
     return render_template("admin.html")
 
-@app.route('/user',methods=['GET','POST'])
+@app.route('/user_dashboard',methods=['GET','POST'])
 def user_dashboard():
     return render_template("user.html")
 
 
 
-
+@app.route('/test', methods=['GET'])
+def test():
+    return render_template('test.html')
 
 if __name__ == '__main__':
     with app.app_context():

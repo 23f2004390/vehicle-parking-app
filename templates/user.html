@@ -7,9 +7,21 @@
         <link
     href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
     rel="stylesheet"/>
-    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/user.css">
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-overlay" onclick="this.remove()">
+                    <div class="flash-message flash-{{ category }}" onclick="event.stopPropagation()">
+                        <p>{{ message }}</p>
+                        <button class="login-btn" onclick="this.closest('.flash-overlay').remove()">OK</button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
     <div class="container">
         <div class="sidebar">
             <div class="profile">
