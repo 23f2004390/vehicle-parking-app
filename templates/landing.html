@@ -62,9 +62,10 @@
             <div class="register" id="register-form" style="display: none;">
             <h2><i class="ri-registered-fill"></i> Register</h2>
             <form action="/register" method="post">
-                <input type="text" name="username" placeholder="Username" required />
+                <input type="text" name="username" placeholder="Username ~> unique" required />
                 <input type="email" name="email" placeholder="Email" required />
                 <input type="password" name="password" placeholder="Password" required />
+                <input type="text" name="pin_code" placeholder="Pin code" required />
                 <button type="submit">Register</button>
                 <p>Already have an account? <a href="#" id="show-login">Login</a></p>
             </form>

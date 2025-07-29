@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            /* display: none; */
+            width: 280px;
+            background-color: #1e3a8a;
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .kpi-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- 1. Root Container -->
+    <div class="container">
+        
+        <!-- 2. Sidebar Container -->
+        <div class="sidebar">
+            <!-- 4. Admin Profile Section -->
+            <div class="admin-profile">
+                <h3>👤 Admin</h3>
+            </div>
+            <!-- 5. Navigation Menu Container -->
+            <nav class="nav-menu">
+                <!-- 6. Dashboard Item -->
+                <div class="nav-item">📊 Dashboard</div>
+                <!-- 7. Parking Lots Item -->
+                <div class="nav-item">🅿️ Parking Lots</div>
+                <!-- 8. North Item -->
+                <div class="nav-item">👥 North</div>
+                <!-- 9. Settings Item (top) -->
+                <div class="nav-item">⚙️ Settings</div>
+            </nav>
+            
+            <!-- 10. Bottom Settings Item -->
+            <div class="bottom-settings">
+                <div class="nav-item">⚙️ Settings</div>
+            </div>
+        </div>
+        
+        <!-- 3. Main Content Container -->
+        <div class="main-content">
+            
+            <!-- 11. Header Container -->
+            <div class="header">
+                <!-- 12. Title Section -->
+                <div class="title-section">
+                    <h1>Admin Dashboard</h1>
+                </div>
+                <!-- 13. Header Actions -->
+                <div class="header-actions">
+                    <button>⬇️</button>
+                    <button>☰</button>
+                </div>
+            </div>
+            
+            <!-- 14. KPI Row Container -->
+            <div class="kpi-row">
+                <!-- 15. New Parking Lots Card -->
+                <div class="kpi-card" style="background-color: #1e3a8a; color: white;">
+                    <div>New Parking Lots</div>
+                    <div style="font-size: 2rem; font-weight: bold;">12</div>
+                </div>
+                <!-- 16. Available Spots Card -->
+                <div class="kpi-card">
+                    <div>Available Spots</div>
+                    <div style="font-size: 2rem; font-weight: bold;">315</div>
+                </div>
+                <!-- 17. Occupied Spots Card -->
+                <div class="kpi-card">
+                    <div>Occupied Spots</div>
+                    <div style="font-size: 2rem; font-weight: bold;">147</div>
+                </div>
+                <!-- 18. Dashboard Stories Card -->
+                <div class="kpi-card">
+                    <div>Dashboard Stories</div>
+                    <div style="font-size: 2rem; font-weight: bold;">1,256</div>
+                </div>
+            </div>
+            
+            <!-- 19. Content Grid Container -->
+            <div class="content-grid">
+                
+                <!-- 20. Left Column -->
+                <div class="left-column">
+                    
+                    <!-- 21. Parking Lot Management Card -->
+                    <div class="card">
+                        <!-- 22. Table Header -->
+                        <h3>Parking Lot Management</h3>
+                        
+                        <!-- 23. Table Body Container -->
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parking Lot</th>
+                                    <th>Price</th>
+                                    <th>Capacity</th>
+                                    <th>Available Spots</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 24. Lot A Row -->
+                                <tr>
+                                    <td>Lot A</td>
+                                    <td>$10.02/h</td>
+                                    <td>310</td>
+                                    <td>181</td>
+                                </tr>
+                                <!-- 25. Lot B Row -->
+                                <tr>
+                                    <td>Lot B</td>
+                                    <td>$10.04/h</td>
+                                    <td>124</td>
+                                    <td>147</td>
+                                </tr>
+                                <!-- 26. Lot C Row -->
+                                <tr>
+                                    <td>Lot C</td>
+                                    <td>$10.03/h</td>
+                                    <td>160</td>
+                                    <td>148</td>
+                                </tr>
+                                <!-- 27. Lot D Row -->
+                                <tr>
+                                    <td>Lot D</td>
+                                    <td>$10.02/h</td>
+                                    <td>140</td>
+                                    <td>166</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 28. Recent Activity Card (Left) -->
+                    <div class="card">
+                        <!-- 29. Activity Header -->
+                        <h3>Recent Activity</h3>
+                        
+                        <!-- 30. Activity List Container -->
+                        <div class="activity-list">
+                            <!-- 31. Santh Elanin Item -->
+                            <div class="activity-item">
+                                <div class="avatar">SE</div>
+                                <div>
+                                    <div>Santh Elanin</div>
+                                    <div style="font-size: 0.8rem; color: #666;">Parking Division</div>
+                                </div>
+                                <div style="margin-left: auto; color: #666;">2 min ago</div>
+                            </div>
+                            <!-- 32. Susth Eraan Item -->
+                            <div class="activity-item">
+                                <div class="avatar">SE</div>
+                                <div>
+                                    <div>Susth Eraan</div>
+                                    <div style="font-size: 0.8rem; color: #666;">Inspect & Lounge</div>
+                                </div>
+                                <div style="margin-left: auto; color: #666;">2 min ago</div>
+                            </div>
+                            <!-- 33. Santh Wthan Item -->
+                            <div class="activity-item">
+                                <div class="avatar">SW</div>
+                                <div>
+                                    <div>Santh Wthan</div>
+                                    <div style="font-size: 0.8rem; color: #666;">Speed & Launch</div>
+                                </div>
+                                <div style="margin-left: auto; color: #666;">2 min ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 34. Right Column -->
+                <div class="right-column">
+                    
+                    <!-- 35. Occupancy Card -->
+                    <div class="card">
+                        <!-- 36. Chart Title -->
+                        <h3>Occupancy</h3>
+                        <!-- 37. Donut Chart Container -->
+                        <div class="chart-container" style="height: 200px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 4px;">
+                            [Donut Chart]
+                        </div>
+                    </div>
+                    
+                    <!-- 38. Revenue Card -->
+                    <div class="card">
+                        <!-- 39. Chart Title -->
+                        <h3>Revenue</h3>
+                        <!-- 40. Bar Chart Container -->
+                        <div class="chart-container" style="height: 200px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 4px;">
+                            [Bar Chart]
+                        </div>
+                    </div>
+                    
+                    <!-- 41. Recent Activity Card (Right) -->
+                    <div class="card">
+                        <!-- 42. Activity Header -->
+                        <h3>Recent Activity</h3>
+                        
+                        <!-- 43. Activity List Container -->
+                        <div class="activity-list">
+                            <!-- 44. Surth Eraart Item -->
+                            <div class="activity-item">
+                                <div class="avatar">SE</div>
+                                <div>
+                                    <div>Surth Eraart</div>
+                                    <div style="font-size: 0.8rem; color: #666;">Inspect & Launch</div>
+                                </div>
+                                <div style="margin-left: auto; color: #666;">3 min ago</div>
+                            </div>
+                            <!-- 45. Barth Wtnan Item -->
+                            <div class="activity-item">
+                                <div class="avatar">BW</div>
+                                <div>
+                                    <div>Barth Wtnan</div>
+                                    <div style="font-size: 0.8rem; color: #666;">Inspect & Lounge</div>
+                                </div>
+                                <div style="margin-left: auto; color: #666;">1 min ago</div>
+                            </div>
+                            <!-- 46. Surth Wtivan Item -->
+                            <div class="activity-item">
+                                <div class="avatar">SW</div>
+                                <div>
+                                    <div>Surth Wtivan</div>
+                                    <div style="font-size: 0.8rem; color: #666;">Inspect & Guest</div>
+                                </div>
+                                <div style="margin-left: auto; color: #666;">6 min ago</div>
+                            </div>
+                            <!-- 47. Janh Low Item -->
+                            <div class="activity-item">
+                                <div class="avatar">JL</div>
+                                <div>
+                                    <div>Janh Low</div>
+                                    <div style="font-size: 0.8rem; color: #666;">Inspect & Guest</div>
+                                </div>
+                                <div style="margin-left: auto; color: #666;">1 min ago</div>
+                            </div>
+                            <!-- 48. Franta Eram Item -->
+                            <div class="activity-item">
+                                <div class="avatar">FE</div>
+                                <div>
+                                    <div>Franta Eram</div>
+                                    <div style="font-size: 0.8rem; color: #666;">Inspect & Guest</div>
+                                </div>
+                                <div style="margin-left: auto; color: #666;">1 min ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

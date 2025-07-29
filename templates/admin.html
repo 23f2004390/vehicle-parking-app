@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+        <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/admin.css">
+
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile">
+                <h1 style="border-bottom: 1px solid #d3caca81;">  Admin</h1>
+            </div>
+            <div class="nav">
+                <nav class="nav-item"><a href="#dashboard" class="active">📊 Dashboard</a></nav>
+                <div class="nav-item"><a href="#parking_lots" class="active">🅿️ Parking Lots</a></div>
+                <div class="nav-item"><a href="#users" class="active">🙎 User</a></div>
+                <div class="nav-item"><a href="#activity" class="active">📒Activity</a></div>
+                <div class="nav-item"><a href="#summary" class="active">📈Summary</a></div>
+                <div class="nav-item"><a href="/logout" class="active"><i class="ri-login-box-fill" style="font-size: 2rem;"></i>Logout</a></div>
+            </div>
+
+
+        </div>
+        <div class="main">
+            <div class="header">
+                <div class="title">
+                <h1>Admin Dashboard </h1>
+                </div>
+                <div class="header-icon">
+                    <button>⬇️</button>
+                    <button>☰</button>
+                </div>
+            </div>
+            <div class="four-row">
+                <!-- here i have to use jinja to do loop -->
+                <div class="row-card">
+                </div>
+            </div>
+            <div class="content">
+                <div class="left_column">
+                    <!-- we can use jinja to show multiple line of content -->
+                    <div class="card">
+
+                    </div>
+                </div>
+                <div class="right_column">
+                    <!-- we have to use jinja2 -->
+                    <div class="card">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="parking_lots" id="parking_lots"></div>
+</body>
+</html>

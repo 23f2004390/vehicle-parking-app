@@ -32,10 +32,12 @@ class BookingStatus(enum.Enum):
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(150), nullable=False)
-    password = db.Column(db.String(255), nullable=False)
+    username = db.Column(db.String(50), nullable=False,unique=True)
+    password = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(150), nullable=False, unique=True)
+    pin_code = db.Column(db.String(50), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    feedback = db.Column(db.String(150), default="None")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
@@ -143,6 +145,7 @@ def logout():
 def register():
     if request.method == 'POST':
         username = request.form['username']
+        pin_code = request.form['pin_code']
         password = request.form['password']
         email = request.form['email']
         
@@ -150,13 +153,25 @@ def register():
             flash('Username already exists. Login instead.', 'danger')
             return redirect(url_for('index'))
         
-        new_user = User(username=username, password=password, email=email)
+        new_user = User(username=username,pin_code=pin_code, password=password, email=email)
         db.session.add(new_user)
         db.session.commit()
 
         flash('Registration successful! You can now log in.', 'success')
         return redirect(url_for('index'))
     return render_template('landing.html')
+
+@app.route('/admin',methods=['GET','POST'])
+def admin_dashboard():
+    return render_template("admin.html")
+
+@app.route('/user',methods=['GET','POST'])
+def user_dashboard():
+    return render_template("user.html")
+
+
+
+
 
 if __name__ == '__main__':
     with app.app_context():
