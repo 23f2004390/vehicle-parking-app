@@ -4,70 +4,276 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-        <link
-    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
-    rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/static/css/user.css">
 </head>
 <body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash-overlay" onclick="this.remove()">
-                    <div class="flash-message flash-{{ category }}" onclick="event.stopPropagation()">
-                        <p>{{ message }}</p>
-                        <button class="login-btn" onclick="this.closest('.flash-overlay').remove()">OK</button>
-                    </div>
-                </div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
+    <!-- Flash message example (hidden by default) -->
+    <div class="flash-overlay" style="display: none;" onclick="this.remove()">
+        <div class="flash-message" onclick="event.stopPropagation()">
+            <p>Welcome back!</p>
+            <button class="login-btn" onclick="this.closest('.flash-overlay').remove()">OK</button>
+        </div>
+    </div>
+
     <div class="container">
         <div class="sidebar">
             <div class="profile">
-                <h1 style="border-bottom: 1px solid #d3caca81;">  user</h1>
+                <h1 style="border-bottom: 1px solid #d3caca81;">User</h1>
             </div>
             <div class="nav">
-                <nav class="nav-item"><a href="#dashboard" class="active">📊 Dashboard</a></nav>
-                <!-- <div class="nav-item">📚Booking</div> -->
-                <div class="nav-item"><a href="#search" class="active">🔎search</a></div>
-                <div class="nav-item"><a href="#history" class="active">📒 History</a></div>
-                <div class="nav-item"><a href="#profile" class="active">🙎 Profile</a></div>
-                <div class="nav-item"><a href="/logout" class="active"><i class="ri-login-box-fill" style="font-size: 2rem;"></i>Logout</a></div>
+                <nav class="nav-item"><a href="#dashboard">📊 Dashboard</a></nav>
+                <div class="nav-item"><a href="#search">🔎 Search</a></div>
+                <div class="nav-item"><a href="#history">📒 History</a></div>
+                <div class="nav-item"><a href="#profile">🙎 Profile</a></div>
+                <div class="nav-item"><a href="/logout"><i class="ri-login-box-fill" style="font-size: 2rem;"></i> Logout</a></div>
             </div>
-
-
         </div>
-        <div class="main">
+
+        <div class="main" id="dashboard">
             <div class="header">
                 <div class="title">
-                <h1> Dashboard </h1>
+                    <h1>Dashboard</h1>
                 </div>
                 <div class="header-icon">
                     <button>⬇️</button>
                     <button>☰</button>
                 </div>
             </div>
+
             <div class="four-row">
-                <!-- here i have to use jinja to do loop -->
                 <div class="row-card">
+                    <h3>My Bookings</h3>
+                    <div class="number">12</div>
+                    <small>Total bookings</small>
+                </div>
+                <div class="row-card">
+                    <h3>Upcoming</h3>
+                    <div class="number">3</div>
+                    <small>Next 30 days</small>
+                </div>
+                <div class="row-card">
+                    <h3>Completed</h3>
+                    <div class="number">8</div>
+                    <small>This year</small>
+                </div>
+                <div class="row-card">
+                    <h3>Points</h3>
+                    <div class="number">450</div>
+                    <small>Reward points</small>
                 </div>
             </div>
+
             <div class="content">
                 <div class="left_column">
-                    <!-- we can use jinja to show multiple line of content -->
                     <div class="card">
+                        <h3>Recent Bookings</h3>
+                        <div class="booking-item">
+                            <div><strong>Hotel Paradise - Deluxe Room</strong></div>
+                            <div>Check-in: Dec 15, 2024 | Check-out: Dec 18, 2024</div>
+                            <span class="status-badge status-confirmed">Confirmed</span>
+                        </div>
+                        <div class="booking-item">
+                            <div><strong>City Center Apartment</strong></div>
+                            <div>Check-in: Jan 20, 2025 | Check-out: Jan 22, 2025</div>
+                            <span class="status-badge status-pending">Pending</span>
+                        </div>
+                        <div class="booking-item">
+                            <div><strong>Mountain Resort Suite</strong></div>
+                            <div>Check-in: Nov 10, 2024 | Check-out: Nov 13, 2024</div>
+                            <span class="status-badge status-confirmed">Completed</span>
+                        </div>
+                    </div>
 
+                    <div class="card">
+                        <h3>Quick Actions</h3>
+                        <button class="login-btn" style="margin: 5px;">New Booking</button>
+                        <button class="login-btn" style="margin: 5px;">View All Bookings</button>
+                        <button class="login-btn" style="margin: 5px;">My Favorites</button>
+                        <button class="login-btn" style="margin: 5px;">Contact Support</button>
                     </div>
                 </div>
-                <div class="right_column">
-                    <!-- we have to use jinja2 -->
-                    <div class="card">
 
+                <div class="right_column">
+                    <div class="card">
+                        <h3>Account Summary</h3>
+                        <div class="stat-item">
+                            <span>Account Status</span>
+                            <span style="color: green;">Active</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Member Since</span>
+                            <span>Jan 2023</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Total Spent</span>
+                            <span>$2,450</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Loyalty Level</span>
+                            <span style="color: #1548ad;">Silver</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Notifications</h3>
+                        <div class="activity-item">
+                            <strong>Booking Reminder</strong>
+                            <div>Check-in tomorrow at Hotel Paradise</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <strong>Special Offer</strong>
+                            <div>20% off on weekend bookings</div>
+                            <div class="activity-time">1 day ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <strong>Points Earned</strong>
+                            <div>You earned 50 points from last booking</div>
+                            <div class="activity-time">3 days ago</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+
+
+<div class="search-book" id="search">
+<div class="search-booking" id="search-section">
+    <h3>book parking spot</h3>
+    <form action="/booking_lot" method="POST" class="search-form">
+        
+        <label for="vehicle_number">Vehicle Number</label>
+        <input type="text" name="vehicle_number" id="vehicle_number" placeholder="Vehicle Number" minlength="4" required>
+
+        <label for="timing">Enter Time (in Hours)</label>
+        <input type="number" name="time" id="timing" placeholder="Enter Time in Hours" required min="1">
+
+        <label for="location">Select Location</label>
+        <select name="location" id="location" required>
+            <option value="">Select Location</option>
+            <option value="location1">Location 1</option>
+            <option value="location2">Location 2</option>
+            <option value="location3">Location 3</option>
+            <option value="location4">Location 4</option>
+            <option value="location5">Location 5</option>
+        </select>
+
+        <label for="vehicle_type">Select Vehicle Type</label>
+        <select name="vehicle_type" id="vehicle_type" required>
+            <option value="">Select Vehicle Type</option>
+            <option value="car">Car</option>
+            <option value="motorcycle">Motorcycle</option>
+        </select>
+
+        <label for="spot_type">Select Spot Type</label>
+        <select name="spot_type" id="spot_type" required>
+            <option value="">Select Spot Type</option>
+            <option value="regular">Regular</option>
+            <option value="electric">Electric Chargeable</option>
+        </select>
+
+        <label for="user_id">User ID</label>
+        <input type="hidden" name="user_id" id="user_id" placeholder="User ID" value="{{ user_id }}"  required>
+
+        <button type="submit">Search</button>
+    </form>
+</div>
+<div class="search-booking" id="search-section">
+    <h3>view all booking</h3>
+    <form action="/view_all_booking" method="POST" class="search-form">
+        <input type="hidden" name="user_id" id="user_id" placeholder="User ID" value="{{ user_id }}"  required>
+        <button type="submit">book now</button>
+    </form>
+    <div class="search-results">
+
+    </div>
+</div>
+</div>
+
+
+
+
+
+
+
+    <!-- history--- -->
+    <div class="history" id="history">
+        <h3>Recent Bookings</h3>
+        <div class="booking-item">
+            <div><strong>Hotel Paradise - Deluxe Room</strong></div>
+            <div>Check-in: Dec 15, 2024 | Check-out: Dec 18, 2024</div>
+            <span class="status-badge status-confirmed">Confirmed</span>
+        </div>
+        <div class="booking-item">
+            <div><strong>City Center Apartment</strong></div>
+            <div>Check-in: Jan 20, 2025 | Check-out: Jan 22, 2025</div>
+            <span class="status-badge status-pending">Pending</span>
+        </div>
+        <div class="booking-item">
+            <div><strong>Mountain Resort Suite</strong></div>
+            <div>Check-in: Nov 10, 2024 | Check-out: Nov 13, 2024</div>
+            <span class="status-badge status-confirmed">Completed</span>
+        </div>
+    </div>
+    <div class="profile-edit" id="profile">
+    <h3>Edit Profile</h3>
+    
+    <!-- Profile Information Form -->
+    <form action="/update-profile" method="POST" class="profile-form">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" value="user123" class="profile-input" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" value="user123@example.com" class="profile-input" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="tel" name="phone" id="phone" placeholder="Enter phone number" class="profile-input">
+        </div>
+        
+        <div class="form-group">
+            <label for="fullname">Full Name:</label>
+            <input type="text" name="fullname" id="fullname" placeholder="Enter full name" class="profile-input">
+        </div>
+        
+        <!-- Action Buttons for Profile -->
+        <div class="form-actions">
+            <button type="submit" class="save-btn">Update Profile</button>
+            <button type="reset" class="cancel-btn">Reset</button>
+        </div>
+    </form>
+    
+    <!-- Change Password Form -->
+    <form action="/change-password" method="POST" class="password-section">
+        <h4>Change Password</h4>
+        <div class="form-group">
+            <label for="currentPassword">Current Password:</label>
+            <input type="password" name="current_password" id="currentPassword" placeholder="Enter current password" class="profile-input" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="newPassword">New Password:</label>
+            <input type="password" name="new_password" id="newPassword" placeholder="Enter new password" class="profile-input" required minlength="6">
+        </div>
+        
+        <div class="form-group">
+            <label for="confirmPassword">Confirm New Password:</label>
+            <input type="password" name="confirm_password" id="confirmPassword" placeholder="Confirm new password" class="profile-input" required minlength="6">
+        </div>
+        
+        <!-- Action Buttons for Password -->
+        <div class="form-actions">
+            <button type="submit" class="save-btn">Change Password</button>
+            <button type="reset" class="cancel-btn">Clear</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>

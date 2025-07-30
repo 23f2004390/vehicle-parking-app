@@ -1,607 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <title>Parking Lot Booking</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+    }
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            color: #0f0f0f;
-            background-color: #f5f5f5;
-        }
+    .container-search {
+      padding: 40px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      min-height: 100vh;
+    }
 
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
+    .search-container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
 
-        .sidebar {
-            width: 240px;
-            background-color: #1548ad;
-            color: #fff;
-            padding: 20px;
-            position: fixed;
-            height: 100vh;
-        }
+    .search-title {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #1548ad;
+    }
 
-        .profile h1 {
-            border-bottom: 1px solid #d3caca81;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
+    .search-controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
 
-        .nav {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            margin-top: 20px;
-        }
+    .search-dropdown, .search-input {
+      padding: 12px 16px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
 
-        .nav-item {
-            text-decoration: none;
-            color: #fff;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            display: block;
-            transition: color 0.3s ease;
-            margin-top: 32px;
-            font-weight: 600;
-            font-size: 1.5rem;
-        }
+    .search-input {
+      flex: 1;
+      min-width: 250px;
+    }
 
-        .nav-item a {
-            color: inherit;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+    .search-input:focus, .search-dropdown:focus {
+      outline: none;
+      border-color: #1548ad;
+    }
 
-        .nav-item a:hover {
-            color: #b5b5c7;
-        }
+    .example-text {
+      background: #e8f2ff;
+      padding: 15px;
+      border-radius: 6px;
+      color: #1548ad;
+      font-style: italic;
+      border-left: 4px solid #1548ad;
+    }
 
-        .main {
-            margin-left: 240px;
-            padding: 20px;
-            flex: 1;
-        }
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #563e3e27;
-        }
+    .parking-lot-card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-left: 4px solid #1548ad;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
 
-        .header-icon button {
-            background: #1548ad;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            margin-left: 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
+    .parking-lot-card:hover {
+      transform: scale(1.01);
+    }
 
-        .four-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+    .lot-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
 
-        .row-card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 3px 4px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid #1548ad;
-            transition: transform 0.2s ease;
-        }
+    .lot-title {
+      font-size: 1.3rem;
+      color: #1548ad;
+      font-weight: bold;
+    }
 
-        .row-card:hover {
-            transform: translateY(-2px);
-        }
+    .lot-info p {
+      margin: 6px 0;
+      color: #444;
+    }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+    .occupancy-bar {
+      width: 100%;
+      height: 8px;
+      background: #eee;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
 
-        .card-title {
-            font-size: 0.9rem;
-            color: #666;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
+    .occupancy-fill {
+      height: 100%;
+      background: #28a745;
+      transition: width 0.3s ease;
+    }
 
-        .card-icon {
-            font-size: 1.5rem;
-            color: #1548ad;
-        }
+    .spots-preview {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
 
-        .card-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #1548ad;
-            margin-bottom: 8px;
-        }
+    .spot {
+      aspect-ratio: 1;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-        .card-change {
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+    .spot.available {
+      background: #28a745;
+      color: white;
+    }
 
-        .change-positive {
-            color: #28a745;
-        }
+    .spot.occupied {
+      background: #dc3545;
+      color: white;
+    }
 
-        .change-negative {
-            color: #dc3545;
-        }
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
 
-        .content {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-        }
+    .popup-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      width: 400px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
 
-        .card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
+    .popup-content h3 {
+      margin-bottom: 20px;
+      color: #1548ad;
+    }
 
-        .card h3 {
-            color: #1548ad;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-        }
+    .popup-content form div {
+      margin-bottom: 15px;
+    }
 
-        .chart-container {
-            height: 300px;
-            position: relative;
-            margin-bottom: 20px;
-        }
+    .popup-content input, .popup-content select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
 
-        .bar-chart {
-            display: flex;
-            align-items: flex-end;
-            height: 200px;
-            gap: 10px;
-            margin: 20px 0;
-        }
+    .popup-content button {
+      padding: 10px 16px;
+      font-size: 1rem;
+      background: #1548ad;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-        .bar {
-            background: linear-gradient(to top, #1548ad, #4a90e2);
-            border-radius: 4px 4px 0 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            color: white;
-            font-size: 0.8rem;
-            font-weight: bold;
-            padding: 5px;
-            min-width: 40px;
-            transition: all 0.3s ease;
-        }
+    .popup-content button[type="button"] {
+      background: #888;
+      margin-left: 10px;
+    }
 
-        .bar:hover {
-            transform: scale(1.05);
-            background: linear-gradient(to top, #0d3a8a, #1548ad);
-        }
-
-        .activity-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #1548ad;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-        }
-
-        .activity-content {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .activity-time {
-            color: #666;
-            font-size: 0.85rem;
-        }
-
-        .progress-item {
-            margin-bottom: 20px;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #eee;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(to right, #1548ad, #4a90e2);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-box {
-            text-align: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 6px;
-        }
-
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #1548ad;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 0.85rem;
-            margin-top: 4px;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        .data-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #1548ad;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-    </style>
+    .popup-content button:hover {
+      opacity: 0.9;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="profile">
-                <h1>Admin</h1>
-            </div>
-            <div class="nav">
-                <nav class="nav-item"><a href="#dashboard" class="active">📊 Dashboard</a></nav>
-                <div class="nav-item"><a href="#search-section">🅿️ Parking Lots</a></div>
-                <div class="nav-item"><a href="#users">🙎 User</a></div>
-                <div class="nav-item"><a href="#activity">📒Activity</a></div>
-                <div class="nav-item"><a href="#summary">📈Summary</a></div>
-                <div class="nav-item"><a href="/logout"><i class="ri-login-box-fill" style="font-size: 2rem;"></i>Logout</a></div>
-            </div>
-        </div>
 
-        <div class="main" id="dashboard">
-            <div class="header">
-                <div class="title">
-                    <h1>Admin Dashboard</h1>
-                </div>
-                <div class="header-icon">
-                    <button>⬇️</button>
-                    <button>☰</button>
-                </div>
-            </div>
-
-            <div class="four-row">
-                <div class="row-card">
-                    <div class="card-header">
-                        <div class="card-title">Total Parking Lots</div>
-                        <div class="card-icon">🅿️</div>
-                    </div>
-                    <div class="card-value">247</div>
-                    <div class="card-change change-positive">
-                        <i class="ri-arrow-up-line"></i>
-                        +12% from last month
-                    </div>
-                </div>
-
-                <div class="row-card">
-                    <div class="card-header">
-                        <div class="card-title">Active Users</div>
-                        <div class="card-icon">👥</div>
-                    </div>
-                    <div class="card-value">1,894</div>
-                    <div class="card-change change-positive">
-                        <i class="ri-arrow-up-line"></i>
-                        +8.2% from last month
-                    </div>
-                </div>
-
-                <div class="row-card">
-                    <div class="card-header">
-                        <div class="card-title">Total Revenue</div>
-                        <div class="card-icon">💰</div>
-                    </div>
-                    <div class="card-value">₹89,450</div>
-                    <div class="card-change change-positive">
-                        <i class="ri-arrow-up-line"></i>
-                        +15.3% from last month
-                    </div>
-                </div>
-
-                <div class="row-card">
-                    <div class="card-header">
-                        <div class="card-title">Occupancy Rate</div>
-                        <div class="card-icon">📊</div>
-                    </div>
-                    <div class="card-value">72%</div>
-                    <div class="card-change change-negative">
-                        <i class="ri-arrow-down-line"></i>
-                        -2.1% from last month
-                    </div>
-                </div>
-            </div>
-
-            <div class="content">
-                <div class="left_column">
-                    <div class="card">
-                        <h3>Weekly Parking Statistics</h3>
-                        <div class="chart-container">
-                            <div class="bar-chart">
-                                <div class="bar" style="height: 60%;">
-                                    156<br><small>Mon</small>
-                                </div>
-                                <div class="bar" style="height: 80%;">
-                                    203<br><small>Tue</small>
-                                </div>
-                                <div class="bar" style="height: 95%;">
-                                    234<br><small>Wed</small>
-                                </div>
-                                <div class="bar" style="height: 75%;">
-                                    189<br><small>Thu</small>
-                                </div>
-                                <div class="bar" style="height: 90%;">
-                                    221<br><small>Fri</small>
-                                </div>
-                                <div class="bar" style="height: 85%;">
-                                    210<br><small>Sat</small>
-                                </div>
-                                <div class="bar" style="height: 40%;">
-                                    98<br><small>Sun</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h3>Recent Bookings</h3>
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>User ID</th>
-                                        <th>Parking Lot</th>
-                                        <th>Duration</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>USR001</td>
-                                        <td>Velachery Central</td>
-                                        <td>2.5 hrs</td>
-                                        <td>₹150</td>
-                                        <td><span class="status-badge status-active">Active</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>USR002</td>
-                                        <td>T. Nagar Plaza</td>
-                                        <td>4 hrs</td>
-                                        <td>₹240</td>
-                                        <td><span class="status-badge status-active">Active</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>USR003</td>
-                                        <td>Anna Nagar Mall</td>
-                                        <td>1.5 hrs</td>
-                                        <td>₹90</td>
-                                        <td><span class="status-badge status-inactive">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>USR004</td>
-                                        <td>Porur IT Park</td>
-                                        <td>8 hrs</td>
-                                        <td>₹480</td>
-                                        <td><span class="status-badge status-active">Active</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="right_column">
-                    <div class="card">
-                        <h3>Recent Activity</h3>
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="ri-car-line"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">New parking lot added</div>
-                                <div class="activity-time">Adyar Express - 2 hours ago</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="ri-user-add-line"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">New user registered</div>
-                                <div class="activity-time">user_987 - 3 hours ago</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="ri-money-dollar-circle-line"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Payment received</div>
-                                <div class="activity-time">₹240 from USR002 - 4 hours ago</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="ri-settings-3-line"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">System maintenance</div>
-                                <div class="activity-time">Completed - 6 hours ago</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h3>Parking Lot Performance</h3>
-                        <div class="progress-item">
-                            <div class="progress-header">
-                                <span>Velachery Central</span>
-                                <span>85%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 85%"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-header">
-                                <span>T. Nagar Plaza</span>
-                                <span>92%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 92%"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-header">
-                                <span>Anna Nagar Mall</span>
-                                <span>78%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 78%"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-header">
-                                <span>Porur IT Park</span>
-                                <span>95%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 95%"></div>
-                            </div>
-                        </div>
-
-                        <div class="stats-grid">
-                            <div class="stat-box">
-                                <div class="stat-number">4.2</div>
-                                <div class="stat-label">Avg Rating</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-number">128</div>
-                                <div class="stat-label">Today's Bookings</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="container-search">
+  <div class="search-container">
+    <h2 class="search-title">Search Parking Lots</h2>
+    <div class="search-controls">
+      <select class="search-dropdown" id="searchBy">
+        <option value="location">Search by Location</option>
+        <option value="user_id">Search by User ID</option>
+        <option value="lot_name">Search by Lot Name</option>
+      </select>
+      <input type="text" class="search-input" id="searchInput" placeholder="search . . .">
     </div>
+    <div class="example-text">
+      Example: Search parking lots by location, user ID, or lot name. e.g. "chennai", "user123", "Parking #12"
+    </div>
+  </div>
 
-    <script>
-        // Add some interactivity to the dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animate progress bars on load
-            const progressBars = document.querySelectorAll('.progress-fill');
-            progressBars.forEach(bar => {
-                const width = bar.style.width;
-                bar.style.width = '0%';
-                setTimeout(() => {
-                    bar.style.width = width;
-                }, 500);
-            });
-        });
-    </script>
+  <div class="results-grid" id="resultsGrid">
+    <div class="parking-lot-card"
+         data-location="velachery"
+         data-name="velachery central"
+         data-user_id="user123"
+         onclick="openBookingPopup('LOT001')">
+      <div class="lot-header">
+        <div class="lot-title">Parking #12</div>
+      </div>
+      <div class="lot-info">
+        <p><strong>Location:</strong> Velachery Central</p>
+        <p><strong>Occupied:</strong> 3/10 spaces</p>
+      </div>
+      <div class="occupancy-bar">
+        <div class="occupancy-fill" style="width: 30%"></div>
+      </div>
+      <div class="spots-preview">
+        <div class="spot available">A1</div>
+        <div class="spot occupied">B1</div>
+        <div class="spot available">A2</div>
+        <div class="spot available">A3</div>
+        <div class="spot available">A4</div>
+        <div class="spot available">B2</div>
+        <div class="spot available">A5</div>
+        <div class="spot occupied">B3</div>
+        <div class="spot available">A6</div>
+        <div class="spot occupied">B4</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Popup -->
+<div id="bookingPopup" class="popup-overlay">
+  <div class="popup-content">
+    <h3>Book Parking Spot</h3>
+    <form id="bookingForm" method="POST" action="/release_booking">
+      <input type="hidden" name="lot_id" id="lotIdInput">
+      <div>
+        <label for="vehicleNumber">Vehicle Number</label>
+        <input type="text" id="vehicleNumber" name="vehicle_number" required>
+      </div>
+      <div>
+        <label for="vehicleType">Vehicle Type</label>
+        <select id="vehicleType" name="vehicle_type" required>
+          <option value="Car">Car</option>
+          <option value="Bike">Bike</option>
+          <option value="Auto">Auto</option>
+        </select>
+      </div>
+      <div>
+        <label>Start Time</label>
+        <input type="text" id="startTime" name="start_time" readonly>
+      </div>
+      <div>
+        <label>End Time</label>
+        <input type="text" id="endTime" name="end_time" readonly>
+      </div>
+      <div style="margin-top: 12px;">
+        <button type="submit">Confirm Booking</button>
+        <button type="button" onclick="closeBookingPopup()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // SEARCH LOGIC
+  document.getElementById('searchInput').addEventListener('input', function () {
+    const searchTerm = this.value.toLowerCase().trim();
+    const searchBy = document.getElementById('searchBy').value;
+    const cards = document.querySelectorAll('.parking-lot-card');
+
+    cards.forEach(card => {
+      let text = '';
+      if (searchBy === 'location') text = card.dataset.location || '';
+      else if (searchBy === 'lot_name') text = card.dataset.name || '';
+      else if (searchBy === 'user_id') text = card.dataset.user_id || '';
+
+      card.style.display = text.toLowerCase().includes(searchTerm) ? 'block' : 'none';
+    });
+  });
+
+  // BOOKING POPUP
+  function openBookingPopup(lotId) {
+    document.getElementById('bookingPopup').style.display = 'flex';
+    document.getElementById('lotIdInput').value = lotId;
+    const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+    document.getElementById('startTime').value = now;
+    document.getElementById('endTime').value = '';
+  }
+
+  function closeBookingPopup() {
+    document.getElementById('bookingPopup').style.display = 'none';
+  }
+
+  document.getElementById('bookingForm').addEventListener('submit', function () {
+    const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+    document.getElementById('endTime').value = now;
+  });
+</script>
+
 </body>
 </html>

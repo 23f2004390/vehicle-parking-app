@@ -29,8 +29,8 @@ body{
     background: white;
     padding: 50px;
     max-width: 400px;
-    border-radius: 20% / 50%; /* Adjusted border radius for a unique shape */;
-    box-shadow: 0 4px 6px rgba(190, 27, 27, 0.2);
+    border-radius: 20% / 10%; /* Adjusted border radius for a unique shape */;
+    box-shadow: 0 4px 6px rgba(39, 1, 109, 0.307);
     text-align: center;
     animation: scaleIn 0.3s ease-out;
 }

@@ -170,6 +170,15 @@ def admin_dashboard():
         return redirect(url_for('index'))
     return render_template("admin.html")
 
+
+
+
+
+
+
+
+
+
 @app.route('/user_dashboard',methods=['GET','POST'])
 def user_dashboard():
     return render_template("user.html")
