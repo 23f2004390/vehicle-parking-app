@@ -54,10 +54,10 @@
                         <div class="card-title">Total Parking Lots</div>
                         <div class="card-icon">🅿️</div>
                     </div>
-                    <div class="card-value">247</div>
+                        <div class="card-value">{{ parking_lots|length }}</div>
                     <div class="card-change change-positive">
                         <i class="ri-arrow-up-line"></i>
-                        +12% from last month
+                        {{ (parking_lots | length)}} new lots added this month
                     </div>
                 </div>
 
@@ -66,10 +66,10 @@
                         <div class="card-title">Active Users</div>
                         <div class="card-icon">👥</div>
                     </div>
-                    <div class="card-value">1,894</div>
+                    <div class="card-value">{{(users | length)}}</div>
                     <div class="card-change change-positive">
                         <i class="ri-arrow-up-line"></i>
-                        +8.2% from last month
+                        {{ (users | length) }} new users registered this month
                     </div>
                 </div>
 
@@ -78,10 +78,10 @@
                         <div class="card-title">Total Revenue</div>
                         <div class="card-icon">💰</div>
                     </div>
-                    <div class="card-value">₹89,450</div>
+                    <div class="card-value">{{bookings.total_cost | map(attribute='total_cost') | sum}}</div>
                     <div class="card-change change-positive">
                         <i class="ri-arrow-up-line"></i>
-                        +15.3% from last month
+                        {{ (bookings.total_cost | map(attribute='total_cost') | sum ) /1000}} ₹ earned this month
                     </div>
                 </div>
 
@@ -90,10 +90,21 @@
                         <div class="card-title">Occupancy Rate</div>
                         <div class="card-icon">📊</div>
                     </div>
-                    <div class="card-value">72%</div>
+                    <div class="card-value">
+                        {% set total_lots = parking_lots.available_spots | map(attribute='total_spots') | sum %}
+                        {% if total_lots > 0 %}
+                            {{ ((parking_lots|length / total_lots) * 100) | round(2) }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </div>
                     <div class="card-change change-negative">
                         <i class="ri-arrow-down-line"></i>
-                        -2.1% from last month
+                        {% if total_lots > 0 %}
+                            {{ ((parking_lots|length / total_lots) * 100) | round(2) }}% occupancy
+                        {% else %}
+                            0% occupancy
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -105,6 +116,7 @@
                         <h3>Recent Bookings</h3>
                         <div class="table-container">
                             <table class="data-table">
+
                                 <thead>
                                     <tr>
                                         <th>User ID</th>
@@ -114,35 +126,16 @@
                                         <th>Status</th>
                                     </tr>
                                 </thead>
+                                {% for booking in bookings[:5] %}
                                 <tbody>
                                     <tr>
-                                        <td>USR001</td>
-                                        <td>Velachery Central</td>
-                                        <td>2.5 hrs</td>
-                                        <td>₹150</td>
-                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td>{{ booking.user_id }}</td>
+                                        <td>{{ booking.parking_lot }}</td>
+                                        <td>{{ booking.duration }} hours</td>
+                                        <td>₹{{ booking.total_cost }}</td>
+                                        <td><span class="status-badge status-active">{{ booking.status }}</span></td>
                                     </tr>
-                                    <tr>
-                                        <td>USR002</td>
-                                        <td>T. Nagar Plaza</td>
-                                        <td>4 hrs</td>
-                                        <td>₹240</td>
-                                        <td><span class="status-badge status-active">Active</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>USR003</td>
-                                        <td>Anna Nagar Mall</td>
-                                        <td>1.5 hrs</td>
-                                        <td>₹90</td>
-                                        <td><span class="status-badge status-inactive">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>USR004</td>
-                                        <td>Porur IT Park</td>
-                                        <td>8 hrs</td>
-                                        <td>₹480</td>
-                                        <td><span class="status-badge status-active">Active</span></td>
-                                    </tr>
+                                {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -150,26 +143,17 @@
                     <div class="card">
                         <h3>Users info</h3>
                         <div class="user">
+                            {% for user in users[:5] %}
                             <div class="user-info">
-                                <p><strong>User ID:</strong> USR001</p>
-                                <p><strong>Name:</strong> John Doe</p>
-                                <p><strong>Email:</strong> 2T7Fp@example.com</p>
+                                <p><strong>User ID:</strong> {{ user.id }}</p>
+                                <p><strong>Name:</strong> {{ user.username }}</p>
+                                <p><strong>Email:</strong> {{ user.email }}</p>
                             </div>
                             <div class="user-actions">
-                                <button class="action-btn" onclick="openUserEditPopup('USR001', 'John Doe', '2T7Fp@example.com', '123-456-7890')">Edit</button>
-                                <button class="action-btn">Delete</button>
+                                <button class="action-btn" onclick="openUserEditPopup('{{ user.id }}', '{{ user.username }}', '{{ user.email }}', '{{ user.phone }}')">Edit</button>
+                                <button class="action-btn" onclick="deleteUser('{{ user.id }}', '{{ user.username }}')">Delete</button>
                             </div>
-                        </div>
-                        <div class="user">
-                            <div class="user-info">
-                                <p><strong>User ID:</strong> USR002</p>
-                                <p><strong>Name:</strong> Jane Smith</p>
-                                <p><strong>Email:</strong> 9GZc4@example.com</p>
-                            </div>
-                            <div class="user-actions">
-                                <button class="action-btn" onclick="openUserEditPopup('USR002', 'Jane Smith', '9GzC4@example.com', '987-654-3210')">Edit</button>
-                                <button class="action-btn">Delete</button>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -177,50 +161,26 @@
                     <!-- we have to use jinja2 -->
                     <div class="card">
                         <h3>Parking Lot Performance</h3>
+                        {% for lot in parking_lots %}
                         <div class="progress-item">
                             <div class="progress-header">
-                                <span>Velachery Central</span>
-                                <span>85%</span>
+                                <span>{{ lot.name }}</span>
+                                <span>{{ (lot.available_spots - lot.total_spots) / lot.total_spots * 100 }}%</span>
                             </div>
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: 85%"></div>
+                                <div class="progress-fill" style="width: {{ lot.available_spots / lot.total_spots * 100 }}%"></div>
                             </div>
                         </div>
-                        <div class="progress-item">
-                            <div class="progress-header">
-                                <span>T. Nagar Plaza</span>
-                                <span>92%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 92%"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-header">
-                                <span>Anna Nagar Mall</span>
-                                <span>78%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 78%"></div>
-                            </div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-header">
-                                <span>Porur IT Park</span>
-                                <span>95%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 95%"></div>
-                            </div>
-                        </div>
+                        {% endfor %}
+                        
 
                         <div class="stats-grid">
                             <div class="stat-box">
-                                <div class="stat-number">4.2</div>
-                                <div class="stat-label">Avg Rating</div>
+                                <div class="stat-number">{{ parking_lots | length }}</div>
+                                <div class="stat-label">Total Parking Lots</div>
                             </div>
                             <div class="stat-box">
-                                <div class="stat-number">128</div>
+                                <div class="stat-number">{{booking | length}}</div>
                                 <div class="stat-label">Today's Bookings</div>
                             </div>
                         </div>
@@ -230,7 +190,7 @@
                         <div class="summary-item">
                             <div class="summary-header">
                                 <span>Total Revenue</span>
-                                <span>₹89,450</span>
+                                <span>{{ parking_lots.cost | sum }}</span>
                             </div>
                             <div class="summary-bar">
                                 <div class="summary-fill" style="width: 100%"></div>
@@ -239,7 +199,7 @@
                         <div class="summary-item">
                             <div class="summary-header">
                                 <span>Total Bookings</span>
-                                <span>128</span>
+                                <span>{{ booking | length }}</span>
                             </div>
                             <div class="summary-bar">
                                 <div class="summary-fill" style="width: 100%"></div>
@@ -264,7 +224,7 @@
             <div class="search-controls">
                 <select class="search-dropdown" id="searchBy">
                     <option value="location">Search by Location</option>
-                    <option value="user_id">Search by User ID</option>
+                    <!-- <option value="user_id">Search by User ID</option> -->
                     <option value="lot_name">Search by Lot Name</option>
                 </select>
                 <input type="text" class="search-input" id="searchInput" placeholder=" search . . .">
@@ -302,9 +262,9 @@
                     <div class="spots-preview">
                         {% for spot in lot.spots %}
                             {% if spot.is_available %}
-                                <div class="spot available">{{ spot.spot_number }}</div>
+                                <div class="spot available">{{ spot.id }}</div>
                             {% else %}
-                                <div class="spot occupied">{{ spot.spot_number }}</div>
+                                <div class="spot occupied">{{ spot.id }}</div>
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -320,9 +280,9 @@
 <!-- ----------------------------------- -->
     <div class="container-summary" id="summary">
         <h2>Summary</h2>
-        <p>Total Parking Lots: 247</p>
-        <p>Total Users: 1,894</p>
-        <p>Total Revenue: ₹89,450</p>
+        <p>Total Parking Lots: {{ parking_lots | length }}</p>
+        <p>Total Users: {{ users | length }}</p>
+        <p>Total Revenue: ₹{{ bookings | sum(attribute='total_cost') | default(0) }}</p>
     </div>
     <footer>
         <p>&copy; {{ year|default(2025) }} Parking Management System</p>
@@ -344,11 +304,11 @@
                 <label for="editUserEmail">Email:</label>
                 <input type="email" id="editUserEmail" name="email" required>
             </div>
-            
             <div class="form-group">
-                <label for="editUserPhone">Phone:</label>
-                <input type="tel" id="editUserPhone" name="phone">
+                <label for="editUserEmail">Address:</label>
+                <input type="email" id="editUserAddress" name="address" required>
             </div>
+            
             <div class="form-group">
                 <label for="editUserPassword">Password:</label>
                 <input type="password" id="editUserPassword" name="password">
@@ -575,98 +535,47 @@
             <!-- Booking Stats -->
             <div class="booking-stats">
                 <div class="stat-card">
-                    <div class="stat-number">128</div>
+                    <div class="stat-number">{{ bookings | length }}</div>
                     <div class="stat-label">Total Bookings</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">45</div>
+                    <div class="stat-number">{{ bookings | selectattr('status', 'equalto', 'active') | list | length }}</div>
                     <div class="stat-label">Active Now</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">₹12,450</div>
+                    <div class="stat-number">₹{{ bookings | selectattr('date', 'equalto', today_date) | sum(attribute='total_cost') | default(0) }}</div>
                     <div class="stat-label">Today's Revenue</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">83</div>
+                    <div class="stat-number">{{ bookings | selectattr('status', 'equalto', 'completed') | list | length }}</div>
                     <div class="stat-label">Completed</div>
                 </div>
             </div>
 
             <!-- Booking List -->
             <div class="booking-list" id="bookingGrid">
-                <div class="booking-card" data-status="active" data-user="usr001" data-lot="velachery central">
+                <!--jinja booking cards-->
+                {% for booking in bookings %}
+                <div class="booking-card" data-status="{{ booking.status }}" data-user="{{ booking.user_id }}" data-lot="{{ booking.parking_lot }}">
                     <div class="booking-header">
-                        <span class="booking-id">BK001</span>
-                        <span class="booking-status status-active">Active</span>
+                        <span class="booking-id">{{ booking.id }}</span>
+                        <span class="booking-status status-{{ booking.status }}">{{ booking.status | capitalize }}</span>
                     </div>
                     <div class="booking-info">
-                        <p><strong>User:</strong> USR001 - John Doe</p>
-                        <p><strong>Parking Lot:</strong> Velachery Central - Spot A1</p>
-                        <p><strong>Duration:</strong> 2.5 hrs (Started: 10:30 AM)</p>
-                        <p><strong>Amount:</strong> ₹150</p>
-                        <p><strong>Phone:</strong> +91 9876543210</p>
+                        <p><strong>User:</strong> {{ booking.user_id }} - {{ booking.user_name }}</p>
+                        <p><strong>Parking Lot:</strong> {{ booking.parking_lot }} - Spot {{ booking.parking_spot }}</p>
+                        <p><strong>Duration:</strong> {{ booking.duration }} hours (Started: {{ booking.start_time }})</p>
+                        <p><strong>Amount:</strong> ₹{{ booking.total_cost }}</p>
+                        <p><strong>Vehicle_number:</strong> {{ booking.vehicle_number }}</p>
+                        <p><strong>Vehicle type:</strong> {{ booking.vehicle_type }}</p>
                     </div>
                     <div class="booking-actions">
-                        <button class="action-btn" onclick="editBooking('BK001')">Edit</button>
-                        <button class="action-btn" onclick="completeBooking('BK001')">Complete</button>
-                        <button class="action-btn delete-btn" onclick="cancelBooking('BK001')">Cancel</button>
+                        <button class="action-btn" onclick="editBooking('{{ booking.id }}')">Edit</button>
+                        <button class="action-btn" onclick="completeBooking('{{ booking.id }}')">Complete</button>
+                        <button class="action-btn delete-btn" onclick="cancelBooking('{{ booking.id }}')">Cancel</button>
                     </div>
                 </div>
-
-                <div class="booking-card" data-status="active" data-user="usr002" data-lot="t nagar plaza">
-                    <div class="booking-header">
-                        <span class="booking-id">BK002</span>
-                        <span class="booking-status status-active">Active</span>
-                    </div>
-                    <div class="booking-info">
-                        <p><strong>User:</strong> USR002 - Jane Smith</p>
-                        <p><strong>Parking Lot:</strong> T. Nagar Plaza - Spot B3</p>
-                        <p><strong>Duration:</strong> 4 hrs (Started: 11:15 AM)</p>
-                        <p><strong>Amount:</strong> ₹240</p>
-                        <p><strong>Phone:</strong> +91 9876543211</p>
-                    </div>
-                    <div class="booking-actions">
-                        <button class="action-btn" onclick="editBooking('BK002')">Edit</button>
-                        <button class="action-btn" onclick="completeBooking('BK002')">Complete</button>
-                        <button class="action-btn delete-btn" onclick="cancelBooking('BK002')">Cancel</button>
-                    </div>
-                </div>
-
-                <div class="booking-card" data-status="completed" data-user="usr003" data-lot="anna nagar mall">
-                    <div class="booking-header">
-                        <span class="booking-id">BK003</span>
-                        <span class="booking-status status-completed">Completed</span>
-                    </div>
-                    <div class="booking-info">
-                        <p><strong>User:</strong> USR003 - Mike Johnson</p>
-                        <p><strong>Parking Lot:</strong> Anna Nagar Mall - Spot C2</p>
-                        <p><strong>Duration:</strong> 1.5 hrs (Completed: 1:30 PM)</p>
-                        <p><strong>Amount:</strong> ₹90</p>
-                        <p><strong>Phone:</strong> +91 9876543212</p>
-                    </div>
-                    <div class="booking-actions">
-                        <button class="action-btn" onclick="viewBookingDetails('BK003')">View Details</button>
-                        <button class="action-btn delete-btn" onclick="deleteBooking('BK003')">Delete</button>
-                    </div>
-                </div>
-
-                <div class="booking-card" data-status="cancelled" data-user="usr004" data-lot="porur it park">
-                    <div class="booking-header">
-                        <span class="booking-id">BK004</span>
-                        <span class="booking-status status-cancelled">Cancelled</span>
-                    </div>
-                    <div class="booking-info">
-                        <p><strong>User:</strong> USR004 - Sarah Wilson</p>
-                        <p><strong>Parking Lot:</strong> Porur IT Park - Spot D1</p>
-                        <p><strong>Duration:</strong> 3 hrs (Cancelled: 2:45 PM)</p>
-                        <p><strong>Amount:</strong> ₹0 (Refunded)</p>
-                        <p><strong>Phone:</strong> +91 9876543213</p>
-                    </div>
-                    <div class="booking-actions">
-                        <button class="action-btn" onclick="viewBookingDetails('BK004')">View Details</button>
-                        <button class="action-btn delete-btn" onclick="deleteBooking('BK004')">Delete</button>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -685,15 +594,14 @@
                 <label for="createBookingLot">Parking Lot:</label>
                 <select id="createBookingLot" name="lot_id" required>
                     <option value="">Select Parking Lot</option>
-                    <option value="LOT001">Velachery Central</option>
-                    <option value="LOT002">T. Nagar Plaza</option>
-                    <option value="LOT003">Anna Nagar Mall</option>
-                    <option value="LOT004">Porur IT Park</option>
+                    {% for lot in parking_lots %}
+                    <option value="{{ lot.id }}">{{ lot.name }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="form-group">
-                <label for="createBookingSpot">Parking Spot:</label>
-                <input type="text" id="createBookingSpot" name="spot" placeholder="e.g., A1, B3" required>
+                <label for="createBookingSpot">Number of Parking Spot:</label>
+                <input type="text" id="createBookingSpot" name="spot" placeholder="e.g., 1, 2" required>
             </div>
             <div class="form-group">
                 <label for="createBookingDuration">Duration (hours):</label>

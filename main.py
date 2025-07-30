@@ -56,6 +56,7 @@ class Parking_lot(db.Model):
     total_spots = db.Column(db.Integer, nullable=False)
     electric_spots = db.Column(db.Integer, nullable=True, default=0)
     available_spots = db.Column(db.Integer, nullable=False)
+    rating = db.Column(db.Float, nullable=True, default=0.0)
     parking_cost = db.Column(db.Float, nullable=False)
 
     spots = db.relationship('Parking_spot', backref='Parking_lot', lazy=True, cascade='all, delete-orphan')
@@ -86,7 +87,7 @@ class Booking(db.Model):
     vehicle_number = db.Column(db.String(15), nullable=False)
     vehicle_type = db.Column(db.Enum(VehicleType), nullable=False)  
     start_time = db.Column(db.DateTime, default=datetime.utcnow)
-    end_time = db.Column(db.DateTime, nullable=False)
+    duration = db.Column(db.Integer, nullable=False)  # Duration in hours
     status = db.Column(db.Enum(BookingStatus), default=BookingStatus.ACTIVE)  
     total_cost = db.Column(db.Float, nullable=False)
 

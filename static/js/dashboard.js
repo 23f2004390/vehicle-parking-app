@@ -39,7 +39,8 @@ function openUserEditPopup(userId, name, email, password,address) {
     document.getElementById('editUserId').value = userId;
     document.getElementById('editUserName').value = name;
     document.getElementById('editUserEmail').value = email;
-    // document.getElementById('editUserAddress').value = address || '';
+    document.getElementById('editUserPassword').value =password || '';
+    document.getElementById('editUserAddress').value = address || '';
 
     document.getElementById('userEditPopup').classList.add('active');
 }
