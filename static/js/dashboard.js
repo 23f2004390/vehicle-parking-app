@@ -35,12 +35,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 // User Edit Functions
-function openUserEditPopup(userId, name, email, phone) {
+function openUserEditPopup(userId, name, email, password,address) {
     document.getElementById('editUserId').value = userId;
     document.getElementById('editUserName').value = name;
     document.getElementById('editUserEmail').value = email;
-    document.getElementById('editUserPhone').value = phone || '';
-    
+    // document.getElementById('editUserAddress').value = address || '';
+
     document.getElementById('userEditPopup').classList.add('active');
 }
 
@@ -68,10 +68,7 @@ document.addEventListener('click', function(e) {
 });
 // Create Parking Lot Functions
 function openCreateLotPopup() {
-    
     document.getElementById('createLotForm').reset();
-
-
 document.getElementById('createLotPopup').classList.add('active');
 }
 

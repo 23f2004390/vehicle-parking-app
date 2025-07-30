@@ -167,7 +167,7 @@
                                 <p><strong>Email:</strong> 9GZc4@example.com</p>
                             </div>
                             <div class="user-actions">
-                                <button class="action-btn" onclick="openUserEditPopup('USR002', 'Jane Smith', '9GZc4@example.com', '987-654-3210')">Edit</button>
+                                <button class="action-btn" onclick="openUserEditPopup('USR002', 'Jane Smith', '9GzC4@example.com', '987-654-3210')">Edit</button>
                                 <button class="action-btn">Delete</button>
                             </div>
                         </div>
@@ -283,34 +283,35 @@
         <!-- Search Results Section -->
         <div class="results-grid" id="resultsGrid">
                 <!-- Parking Lot 1 -->
-                <div class="parking-lot-card" data-location="velachery" data-name="velachery central">
+                {% for lot in parking_lots %}
+                <div class="parking-lot-card" data-location="{{ lot.address }}" data-name="{{ lot.prime_location_name }}" data-user_id="{{ lot.user_id }}" onclick="openBookingPopup('{{ lot.lot_id }}')">
                     <div class="lot-header">
-                        <div class="lot-title">Parking #12</div>
+                        <div class="lot-title">{{ lot.prime_location_name }}</div>
                         <div class="lot-actions">
-                            <button class="action-btn" onclick="openLotEditPopup('LOT001', 'Parking #12', 'Velachery Central', 10, 3)">Edit</button>
+                            <button class="action-btn" onclick="openLotEditPopup('{{ lot.lot_id }}', '{{ lot.prime_location_name }}', '{{ lot.address }}', {{ lot.pin_code }}, {{ lot.total_spots }})">Edit</button>
                             <button class="action-btn">Delete</button>
                         </div>
                     </div>
                     <div class="lot-info">
-                        <p><strong>Location:</strong> Velachery Central</p>
-                        <p><strong>Occupied:</strong> 3/10 spaces</p>
+                        <p><strong>Location:</strong> {{ lot.address }}</p>
+                        <p><strong>Occupied:</strong> {{ lot.total_spots - lot.available_spots }} spaces</p>
                     </div>
                     <div class="occupancy-bar">
-                        <div class="occupancy-fill" style="width: 30%"></div>
+                        <div class="occupancy-fill" style="width: {{ lot.available_spots / lot.total_spots * 100 }}%"></div>
                     </div>
                     <div class="spots-preview">
-                        <div class="spot available">A1</div>
-                        <div class="spot occupied">B1</div>
-                        <div class="spot available">A2</div>
-                        <div class="spot available">A3</div>
-                        <div class="spot available">A4</div>
-                        <div class="spot available">B2</div>
-                        <div class="spot available">A5</div>
-                        <div class="spot occupied">B3</div>
-                        <div class="spot available">A6</div>
-                        <div class="spot occupied">B4</div>
+                        {% for spot in lot.spots %}
+                            {% if spot.is_available %}
+                                <div class="spot available">{{ spot.spot_number }}</div>
+                            {% else %}
+                                <div class="spot occupied">{{ spot.spot_number }}</div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
+                {% endfor %}
+                
+
 
                 
             </div>
@@ -348,6 +349,10 @@
                 <label for="editUserPhone">Phone:</label>
                 <input type="tel" id="editUserPhone" name="phone">
             </div>
+            <div class="form-group">
+                <label for="editUserPassword">Password:</label>
+                <input type="password" id="editUserPassword" name="password">
+            </div>
             
             <div class="form-buttons">
                 <button type="submit" class="submit-btn">Update User</button>
@@ -365,23 +370,28 @@
             <input type="hidden" id="editLotId" name="lot_id">
             
             <div class="form-group">
-                <label for="editLotName">Lot Name:</label>
-                <input type="text" id="editLotName" name="lot_name" required>
+                <label for="editLotName">Prime location name:</label>
+                <input type="text" id="editLotName" name="prime_location_name" required>
             </div>
             
             <div class="form-group">
-                <label for="editLotLocation">Location:</label>
-                <input type="text" id="editLotLocation" name="location" required>
+                <label for="editLotLocation">Address:</label>
+                <input type="text" id="editLotLocation" name="address" required>
             </div>
             
             <div class="form-group">
-                <label for="editTotalSpaces">Total Spaces:</label>
-                <input type="number" id="editTotalSpaces" name="total_spaces" min="1" required>
+                <label for="editTotalSpaces">pin code:</label>
+                <input type="number" id="editTotalSpaces" name="pin_code" min="1" required>
             </div>
+
             
             <div class="form-group">
-                <label for="editOccupiedSpaces">Occupied Spaces:</label>
-                <input type="number" id="editOccupiedSpaces" name="occupied_spaces" min="0" required>
+                <label for="editOccupiedSpaces">total spots:</label>
+                <input type="number" id="editOccupiedSpaces" name="total_spots" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="editOccupied">Cost:</label>
+                <input type="number" id="editOccupied" name="cost" min="0" required>
             </div>
             
             <div class="form-buttons">
@@ -395,32 +405,37 @@
 <div class="popup-overlay" id="createLotPopup">
     <div class="popup-form">
         <h3>Create New Parking Lot</h3>
-        <form id="createLotForm" method="POST" action="/lot_create">
+        <form id="createLotForm" method="POST" action="/create_parking_lot">
             
             <div class="form-group">
-                <label for="createLotName">Lot Name:</label>
-                <input type="text" id="createLotName" name="lot_name" placeholder="e.g., Parking #13" required>
+                <label for="createLotName">prime_location_name:</label>
+                <input type="text" id="createLotName" name="prime_location_name" placeholder="e.g., hari niwas mall" required>
             </div>
             
             <div class="form-group">
-                <label for="createLotLocation">Location:</label>
-                <input type="text" id="createLotLocation" name="location" placeholder="e.g., Velachery Central" required>
+                <label for="createLotLocation">Address:</label>
+                <input type="text" id="createLotLocation" name="address" placeholder="hari niwas mall,income tax main road,patna,bihar pin-800001" required>
             </div>
             
             <div class="form-group">
-                <label for="createTotalSpaces">Total Spaces:</label>
-                <input type="number" id="createTotalSpaces" name="total_spaces" min="1" max="100" placeholder="10" required>
+                <label for="createTotalSpaces">Pin code:</label>
+                <input type="number" id="createTotalSpaces" name="pin_code" min="800001" max="899999" placeholder="800001" required>
+            </div>
+            <div class="form-group">
+                <label for="createDescription">total spots:</label>
+                <input type="text" id="createDescription" name="total_spots" placeholder="e.g., 20" required>
+            </div>
+
+            <div class="form-group">
+                <label for="createElectricSpots">Electric Spots:</label>
+                <input type="number" id="createElectricSpots" name="electric_spots" value="0" min="0" step="1" placeholder="how many electric spots e.g.: 0" required>
             </div>
             
             <div class="form-group">
                 <label for="createPricePerHour">Price per Hour (₹):</label>
-                <input type="number" id="createPricePerHour" name="price_per_hour" min="10" step="10" placeholder="60" required>
+                <input type="number" id="createPricePerHour" name="price_per_hour" value="75" min="10" step="5" placeholder="75" required>
             </div>
             
-            <div class="form-group">
-                <label for="createDescription">Description (Optional):</label>
-                <input type="text" id="createDescription" name="description" placeholder="Additional details about the parking lot">
-            </div>
             
             <div class="form-buttons">
                 <button type="submit" class="submit-btn">Create Parking Lot</button>
@@ -459,35 +474,23 @@
 
             <!-- Users Grid -->
             <div class="user-list" id="userGrid">
-                <div class="user-card" data-name="john doe" data-email="ht5wv@example.com" data-userid="usr001">
+                <!--jinja user cards-->
+                {% for user in users %}
+                <div class="user-card" data-name="{{ user.username }}" data-email="{{ user.email }}" data-userid="{{ user.id }}">
                     <div class="user-header">
-                        <span class="user-name">John Doe</span>
-                        <span class="user-id">USR001</span>
+                        <span class="user-name">{{ user.username }}</span>
+                        <span class="user-id">{{ user.id }}</span>
                     </div>
                     <div class="user-info">
-                        <p>Email: <span class="user-email">Ht5WV@example.com</span></p>
-                        <p>Phone: <span class="user-phone">123-456-7890</span></p>
+                        <p>Email: <span class="user-email">{{ user.email }}</span></p>
+                        <p>address: <span class="user-phone">{{ user.address }}</span></p>
                     </div>
                     <div class="user-actions">
-                        <button class="action-btn" onclick="openUserEditPopup('USR001', 'John Doe', 'Ht5WV@example.com', '123-456-7890')">Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteUser('USR001', 'John Doe')">Delete</button>
+                        <button class="action-btn" onclick="openUserEditPopup('{{ user.id }}', '{{ user.username }}', '{{ user.email }}', '{{user.password}}','{{ user.address }}')">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteUser('{{ user.id }}', '{{ user.username }}')">Delete</button>
                     </div>
                 </div>
-
-                <div class="user-card" data-name="jane smith" data-email="9gzc4@example.com" data-userid="usr002">
-                    <div class="user-header">
-                        <span class="user-name">Jane Smith</span>
-                        <span class="user-id">USR002</span>
-                    </div>
-                    <div class="user-info">
-                        <p>Email: <span class="user-email">9GZc4@example.com</span></p>
-                        <p>Phone: <span class="user-phone">987-654-3210</span></p>
-                    </div>
-                    <div class="user-actions">
-                        <button class="action-btn" onclick="openUserEditPopup('USR002', 'Jane Smith', '9GZc4@example.com', '987-654-3210')">Edit</button>
-                        <button class="action-btn delete-btn" onclick="deleteUser('USR002', 'Jane Smith')">Delete</button>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -499,16 +502,16 @@
         <h3>Create New User</h3>
         <form id="createUserForm" method="POST" action="/user_create">
             <div class="form-group">
-                <label for="createUserName">Full Name:</label>
-                <input type="text" id="createUserName" name="name" placeholder="e.g., John Doe" required>
+                <label for="createUserName">User Name:</label>
+                <input type="text" id="createUserName" name="name" placeholder="e.g., rituraj" required>
             </div>
             <div class="form-group">
                 <label for="createUserEmail">Email:</label>
-                <input type="email" id="createUserEmail" name="email" placeholder="john@example.com" required>
+                <input type="email" id="createUserEmail" name="email" placeholder="mymail@exemple.com" required>
             </div>
             <div class="form-group">
-                <label for="createUserPhone">Phone Number:</label>
-                <input type="tel" id="createUserPhone" name="phone" placeholder="+91 9876543210" required>
+                <label for="createUserAddress">Address:</label>
+                <input type="text" id="createUserAddress" name="address" placeholder="e.g., patna bihar india" required>
             </div>
             <div class="form-group">
                 <label for="createUserPassword">Password:</label>

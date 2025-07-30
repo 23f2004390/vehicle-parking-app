@@ -35,7 +35,7 @@ class User(db.Model):
     username = db.Column(db.String(50), nullable=False,unique=True)
     password = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(150), nullable=False, unique=True)
-    pin_code = db.Column(db.String(50), nullable=False)
+    address = db.Column(db.Text, nullable=True, default="None")
     is_admin = db.Column(db.Boolean, default=False)
     feedback = db.Column(db.String(150), default="None")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -54,7 +54,9 @@ class Parking_lot(db.Model):
     address = db.Column(db.Text, nullable=False)  
     pin_code = db.Column(db.Integer, nullable=False)
     total_spots = db.Column(db.Integer, nullable=False)
+    electric_spots = db.Column(db.Integer, nullable=True, default=0)
     available_spots = db.Column(db.Integer, nullable=False)
+    parking_cost = db.Column(db.Float, nullable=False)
 
     spots = db.relationship('Parking_spot', backref='Parking_lot', lazy=True, cascade='all, delete-orphan')
     reviews = db.relationship('Review', backref='Parking_lot', lazy=True)
@@ -66,7 +68,6 @@ class Parking_lot(db.Model):
 class Parking_spot(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     is_occupied = db.Column(db.Boolean, default=False)
-    parking_cost = db.Column(db.Float, nullable=False, default=-1.0)
     lot_id = db.Column(db.Integer, db.ForeignKey('parking_lot.id'), nullable=False)
     spot_type = db.Column(db.Enum(SpotType), default=SpotType.REGULAR)
 
@@ -168,14 +169,46 @@ def admin_dashboard():
     if 'is_admin' not in session or not session['is_admin']:
         flash('Access denied. Admins only.', 'danger')
         return redirect(url_for('index'))
-    return render_template("admin.html")
+    # Fetch all parking lots for admin view
+    parking_lots = Parking_lot.query.all()
+    # fetch all users for admin view
+    users = User.query.all()
+    # fetch all bookings for admin view
+    bookings = Booking.query.all()
+    return render_template("admin.html", parking_lots=parking_lots, users=users, bookings=bookings)
 
+@app.route('/create_parking_lot', methods=['POST'])
+def create_parking_lot():
+    if 'is_admin' not in session or not session['is_admin']:
+        flash('Access denied. Admins only.', 'danger')
+        return redirect(url_for('index'))
 
-
-
-
-
-
+    prime_location_name = request.form['prime_location_name']
+    address = request.form['address']
+    pin_code = request.form['pin_code']
+    total_spots = int(request.form['total_spots'])
+    electric_spots = int(request.form['electric_spots'])
+    if electric_spots > total_spots and electric_spots is None:
+        flash('Electric spots cannot exceed total spots.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    price_per_hour = request.form['price_per_hour']
+    new_lot = Parking_lot(
+        prime_location_name=prime_location_name,
+        address=address,
+        pin_code=pin_code,
+        total_spots=total_spots,
+        available_spots=total_spots,  # all spots are available  while creating time
+        parking_cost=price_per_hour
+    )
+    # Create parking spots for the new lot
+    for i in range(total_spots):
+        new_spot = Parking_spot(is_occupied=False, spot_type=SpotType.REGULAR, Parking_lot=new_lot)
+        db.session.add(new_spot)
+    db.session.add(new_lot)
+    db.session.commit()
+    
+    flash('Parking lot created successfully!', 'success')
+    return redirect(url_for('admin_dashboard'))
 
 
 
@@ -192,5 +225,10 @@ def test():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        db.session.commit()
+        
+        #admin user creation
+        if not User.query.filter_by(username='admin').first():
+            admin_user = User(username='admin', password='admin123', email='Rc2H8@example.com',address="admin", is_admin=True)
+            db.session.add(admin_user)
+            db.session.commit()
     app.run(debug=True)
