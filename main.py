@@ -183,6 +183,7 @@ def user_dashboard():
     user = User.query.get(session['user_id'])
     bookings = Booking.query.filter_by(user_id=user.id).all()
     parking_lots = Parking_lot.query.all()
+    print(parking_lots)
     return render_template("user.html", user=user, bookings=bookings, parking_lots = parking_lots)
 
 ##-----------form submitions  data----------------

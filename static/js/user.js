@@ -102,8 +102,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function to select spot by clicking on visual spot
-function selectSpot(spotId) {
-    // Update dropdown
+function selectSpot(spotId) { 
+    // Update dropdown 
     const spotSelect = document.getElementById('selected_spot');
     if (spotSelect) {
         spotSelect.value = spotId;

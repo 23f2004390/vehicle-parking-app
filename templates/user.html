@@ -63,14 +63,13 @@
                     <small>total duration</small>
                 </div>
             </div>
-
             <div class="content">
                 <div class="left_column">
                     <div class="card">
                         <h3>Recent Bookings</h3>
                         {% for booking in bookings[:5] %}
                         <div class="booking-item">
-                            <!-- <div><strong>parking Address : {{ booking.parking_lot.address }}</strong></div> -->
+                            <div><strong>parking Address : {{parking_lots.address}}</strong></div>
                             <div>Check-in: {{ booking.start_time }} | duration: {{ booking.duration }}</div>
                             <span class="status-badge status-confirmed">{{ booking.status }}</span>
                         </div>
@@ -160,7 +159,7 @@
     <h3>view all booking</h3>
     {% for booking in bookings %}
     <div class="booking-item">
-        <div><strong>Parking Address: {{ booking.parking_lot.address }}</strong></div>
+        <div><strong>Parking Address: {{ parking_lots.address}}</strong></div>
         <div>Check-in: {{ booking.start_time }} | Duration: {{ booking.duration }}</div>
         <span class="status-badge status-confirmed">{{ booking.status }}</span>
         <div><strong>Vehicle Number: {{ booking.vehicle_number }}</strong></div>
@@ -193,7 +192,7 @@
         <h3>Recent Bookings</h3>
         {% for booking in bookings[:5] %}
         <div class="booking-item">
-            <div><strong>parking Address : {{ booking.parking_lot.address }}</strong></div>
+            <div><strong>parking Address : {{ parking_lots.address }}</strong></div>
             <div>Check-in: {{ booking.start_time }} | duration: {{ booking.duration }}</div>
             <span class="status-badge status-confirmed">{{ booking.status }}</span>
         </div>
