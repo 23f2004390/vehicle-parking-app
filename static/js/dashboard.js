@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     });
 });
+
 // User Edit Functions
 function openUserEditPopup(userId, name, email, password,address) {
     document.getElementById('editUserId').value = userId;
@@ -41,19 +42,25 @@ function openUserEditPopup(userId, name, email, password,address) {
     document.getElementById('editUserEmail').value = email;
     document.getElementById('editUserPassword').value =password || '';
     document.getElementById('editUserAddress').value = address || '';
-
     document.getElementById('userEditPopup').classList.add('active');
 }
 
 // Parking Lot Edit Functions
-function openLotEditPopup(lotId, lotName, location, totalSpaces, occupiedSpaces) {
+function openLotEditPopup(lotId, lotName, location, pinCode, totalSpots, lotCost) {
     document.getElementById('editLotId').value = lotId;
     document.getElementById('editLotName').value = lotName;
-    document.getElementById('editLotLocation').value = location
-    document.getElementById('editTotalSpaces').value = totalSpaces
-    document.getElementById('editOccupiedSpaces').value = occupiedSpaces;
-    
+    document.getElementById('editLotLocation').value = location;
+    document.getElementById('editTotalSpaces').value = pinCode;
+    document.getElementById('editOccupiedSpaces').value = totalSpots;
+    document.getElementById('editLotCost').value = lotCost;
     document.getElementById('lotEditPopup').classList.add('active');
+}
+
+function deleteLot(lotId, lotName) {
+    if (confirm(`Are you sure you want to delete lot "${lotName}"?`)) {
+        document.getElementById('deleteLotId').value = lotId;
+        document.getElementById('deleteLotForm').submit();
+    }
 }
 
 // Close popup function
@@ -242,18 +249,5 @@ document.addEventListener('keydown', function(e) {
         closeBookingPopup();
     }
 });
-        // // Toggle between available and occupied spots
-        // document.querySelectorAll('.spot').forEach(spot => {
-        //     spot.addEventListener('click', function() {
-        //         if (this.classList.contains('available')) {
-        //             this.classList.remove('available');
-        //             this.classList.add('occupied');
-        //         } else {
-        //             this.classList.remove('occupied');
-        //             this.classList.add('available');
-        //         }
-        //     });
-        // });
-
-
+        
 

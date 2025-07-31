@@ -56,7 +56,7 @@
                     </div>
                         <div class="card-value">{{ parking_lots|length }}</div>
                     <div class="card-change change-positive">
-                        <i class="ri-arrow-up-line"></i>
+                        <!-- <i class="ri-arrow-up-line"></i> -->
                         {{ (parking_lots | length)}} new lots added this month
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                     </div>
                     <div class="card-value">{{(users | length)}}</div>
                     <div class="card-change change-positive">
-                        <i class="ri-arrow-up-line"></i>
+                        <!-- <i class="ri-arrow-up-line"></i> -->
                         {{ (users | length) }} new users registered this month
                     </div>
                 </div>
@@ -78,10 +78,10 @@
                         <div class="card-title">Total Revenue</div>
                         <div class="card-icon">💰</div>
                     </div>
-                    <div class="card-value">{{bookings.total_cost | map(attribute='total_cost') | sum}}</div>
+                    <div class="card-value">₹{{ bookings | sum(attribute='total_cost') | default(0) }}</div>
                     <div class="card-change change-positive">
                         <i class="ri-arrow-up-line"></i>
-                        {{ (bookings.total_cost | map(attribute='total_cost') | sum ) /1000}} ₹ earned this month
+                        ₹{{ (bookings | sum(attribute='total_cost') | default(0)) }} earned this month
                     </div>
                 </div>
 
@@ -91,21 +91,21 @@
                         <div class="card-icon">📊</div>
                     </div>
                     <div class="card-value">
-                        {% set total_lots = parking_lots.available_spots | map(attribute='total_spots') | sum %}
-                        {% if total_lots > 0 %}
-                            {{ ((parking_lots|length / total_lots) * 100) | round(2) }}%
+                        {% set total_spots = parking_lots | sum(attribute='total_spots') %}
+                        {% if total_spots > 0 %}
+                            {{ ((parking_lots|length / total_spots) * 100) | round(2) }}%
                         {% else %}
                             0%
                         {% endif %}
                     </div>
-                    <div class="card-change change-negative">
-                        <i class="ri-arrow-down-line"></i>
-                        {% if total_lots > 0 %}
-                            {{ ((parking_lots|length / total_lots) * 100) | round(2) }}% occupancy
-                        {% else %}
-                            0% occupancy
-                        {% endif %}
-                    </div>
+                                            <div class="card-change change-negative">
+                            <!-- <i class="ri-arrow-down-line"></i> -->
+                            {% if total_spots > 0 %}
+                                {{ ((parking_lots|length / total_spots) * 100) | round(2) }}% occupancy
+                            {% else %}
+                                0% occupancy
+                            {% endif %}
+                        </div>
                 </div>
             </div>
 
@@ -142,19 +142,19 @@
                     </div>
                     <div class="card">
                         <h3>Users info</h3>
+                        {% for user in users[:5] %}     
                         <div class="user">
-                            {% for user in users[:5] %}
                             <div class="user-info">
                                 <p><strong>User ID:</strong> {{ user.id }}</p>
                                 <p><strong>Name:</strong> {{ user.username }}</p>
                                 <p><strong>Email:</strong> {{ user.email }}</p>
                             </div>
                             <div class="user-actions">
-                                <button class="action-btn" onclick="openUserEditPopup('{{ user.id }}', '{{ user.username }}', '{{ user.email }}', '{{ user.phone }}')">Edit</button>
+                                <button class="action-btn" onclick="openUserEditPopup('{{ user.id }}', '{{ user.username }}', '{{ user.email }}', '{{ user.address }}')">Edit</button>
                                 <button class="action-btn" onclick="deleteUser('{{ user.id }}', '{{ user.username }}')">Delete</button>
                             </div>
-                            {% endfor %}
-                        </div>
+                        </div>  
+                        {% endfor %}
                     </div>
                 </div>
                 <div class="right_column">
@@ -164,7 +164,7 @@
                         {% for lot in parking_lots %}
                         <div class="progress-item">
                             <div class="progress-header">
-                                <span>{{ lot.name }}</span>
+                                <span>{{ lot.prime_location_name }}</span>
                                 <span>{{ (lot.available_spots - lot.total_spots) / lot.total_spots * 100 }}%</span>
                             </div>
                             <div class="progress-bar">
@@ -190,7 +190,7 @@
                         <div class="summary-item">
                             <div class="summary-header">
                                 <span>Total Revenue</span>
-                                <span>{{ parking_lots.cost | sum }}</span>
+                                <span>₹{{ parking_lots | sum(attribute='parking_cost') | default(0) }}</span>
                             </div>
                             <div class="summary-bar">
                                 <div class="summary-fill" style="width: 100%"></div>
@@ -244,12 +244,12 @@
         <div class="results-grid" id="resultsGrid">
                 <!-- Parking Lot 1 -->
                 {% for lot in parking_lots %}
-                <div class="parking-lot-card" data-location="{{ lot.address }}" data-name="{{ lot.prime_location_name }}" data-user_id="{{ lot.user_id }}" onclick="openBookingPopup('{{ lot.lot_id }}')">
+                <div class="parking-lot-card" data-location="{{ lot.address }}" data-name="{{ lot.prime_location_name }}" data-user_id="{{ lot.user_id }}">
                     <div class="lot-header">
                         <div class="lot-title">{{ lot.prime_location_name }}</div>
                         <div class="lot-actions">
-                            <button class="action-btn" onclick="openLotEditPopup('{{ lot.lot_id }}', '{{ lot.prime_location_name }}', '{{ lot.address }}', {{ lot.pin_code }}, {{ lot.total_spots }})">Edit</button>
-                            <button class="action-btn">Delete</button>
+                            <button class="action-btn" onclick="openLotEditPopup('{{ lot.id }}', '{{ lot.prime_location_name }}', '{{ lot.address }}', '{{ lot.pin_code }}', '{{ lot.total_spots }}', '{{ lot.parking_cost }}'); event.stopPropagation();">Edit</button>
+                            <button class="action-btn" onclick="deleteLot('{{ lot.id }}', '{{ lot.prime_location_name }}'); event.stopPropagation();">Delete</button>
                         </div>
                     </div>
                     <div class="lot-info">
@@ -259,7 +259,7 @@
                     <div class="occupancy-bar">
                         <div class="occupancy-fill" style="width: {{ lot.available_spots / lot.total_spots * 100 }}%"></div>
                     </div>
-                    <div class="spots-preview">
+                    <div class="spots-preview" onclick="openBookingPopup('{{ lot.lot_id }}')">
                         {% for spot in lot.spots %}
                             {% if spot.is_available %}
                                 <div class="spot available">{{ spot.id }}</div>
@@ -306,7 +306,7 @@
             </div>
             <div class="form-group">
                 <label for="editUserEmail">Address:</label>
-                <input type="email" id="editUserAddress" name="address" required>
+                <input type="text" id="editUserAddress" name="address" value="{{ users.address }}" required>
             </div>
             
             <div class="form-group">
@@ -350,8 +350,8 @@
                 <input type="number" id="editOccupiedSpaces" name="total_spots" min="0" required>
             </div>
             <div class="form-group">
-                <label for="editOccupied">Cost:</label>
-                <input type="number" id="editOccupied" name="cost" min="0" required>
+                <label for="editLotCost">Cost:</label>
+                <input type="number" id="editLotCost" name="cost" min="0" required>
             </div>
             
             <div class="form-buttons">
@@ -393,7 +393,7 @@
             
             <div class="form-group">
                 <label for="createPricePerHour">Price per Hour (₹):</label>
-                <input type="number" id="createPricePerHour" name="price_per_hour" value="75" min="10" step="5" placeholder="75" required>
+                <input type="number" id="createPricePerHour" name="price_per_hour" value="25" min="10" step="5" placeholder="75" required>
             </div>
             
             
@@ -463,7 +463,7 @@
         <form id="createUserForm" method="POST" action="/user_create">
             <div class="form-group">
                 <label for="createUserName">User Name:</label>
-                <input type="text" id="createUserName" name="name" placeholder="e.g., rituraj" required>
+                <input type="text" id="createUserName" name="username" placeholder="e.g., rituraj" required>
             </div>
             <div class="form-group">
                 <label for="createUserEmail">Email:</label>
@@ -588,28 +588,38 @@
         <form id="createBookingForm" method="POST" action="/booking_create">
             <div class="form-group">
                 <label for="createBookingUser">User ID:</label>
-                <input type="text" id="createBookingUser" name="user_id" placeholder="e.g., USR001" required>
-            </div>
-            <div class="form-group">
-                <label for="createBookingLot">Parking Lot:</label>
-                <select id="createBookingLot" name="lot_id" required>
-                    <option value="">Select Parking Lot</option>
-                    {% for lot in parking_lots %}
-                    <option value="{{ lot.id }}">{{ lot.name }}</option>
+                <select id="createBookingUser" name="user_id" required style="width: 100%;padding: 10px;border-radius: 5px;border: 1px solid #ccc;margin-bottom: 10px;">
+                    <option value="">Select User</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-group">
-                <label for="createBookingSpot">Number of Parking Spot:</label>
-                <input type="text" id="createBookingSpot" name="spot" placeholder="e.g., 1, 2" required>
+                <label for="createBookingLot">Parking prime_location_name</label>
+                <select id="createBookingLot" name="prime_location_name" required style="width: 100%;padding: 10px;border-radius: 5px;border: 1px solid #ccc;margin-bottom: 10px;">
+                    <option value="">Select Parking Lot</option>
+                    {% for lot in parking_lots %}
+                    <option value="{{ lot.prime_location_name }}">{{ lot.prime_location_name }}</option>
+                    {% endfor %}
+                </select>
             </div>
+            
             <div class="form-group">
                 <label for="createBookingDuration">Duration (hours):</label>
                 <input type="number" id="createBookingDuration" name="duration" min="0.5" step="0.5" placeholder="2.5" required>
             </div>
             <div class="form-group">
-                <label for="createBookingAmount">Amount (₹):</label>
-                <input type="number" id="createBookingAmount" name="amount" min="10" placeholder="150" required>
+                <label for="createBookingVehicleNumber">Vehicle Number:</label>
+                <input type="text" id="createBookingVehicleNumber" name="vehicle_number" placeholder="e.g., MH123456" required>
+            </div>
+            <div class="form-group">
+                <label for="createBookingVehicleType">Vehicle Type:</label>
+                <select id="createBookingVehicleType" name="vehicle_type" required style="width: 100%;padding: 10px;border-radius: 5px;border: 1px solid #ccc;margin-bottom: 10px;">
+                    <option value="">Select Vehicle Type</option>
+                    <option value="car">Car</option>
+                    <option value="motorcycle">Motorcycle</option>
+                </select>
             </div>
             <div class="form-buttons">
                 <button type="submit" class="submit-btn">Create Booking</button>
@@ -620,5 +630,8 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<form id="deleteLotForm" method="POST" action="/lot_delete" style="display:none;">
+  <input type="hidden" id="deleteLotId" name="lot_id">
+</form>
 </body>
 </html>

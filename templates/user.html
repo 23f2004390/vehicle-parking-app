@@ -44,23 +44,23 @@
             <div class="four-row">
                 <div class="row-card">
                     <h3>My Bookings</h3>
-                    <div class="number">12</div>
+                    <div class="number">{{ bookings | length }}</div>
                     <small>Total bookings</small>
                 </div>
                 <div class="row-card">
                     <h3>Upcoming</h3>
-                    <div class="number">3</div>
+                    <div class="number">{{ bookings | selectattr('status', 'equalto', 'upcoming') | list | length }}</div>
                     <small>Next 30 days</small>
                 </div>
                 <div class="row-card">
                     <h3>Completed</h3>
-                    <div class="number">8</div>
+                    <div class="number">{{ bookings | selectattr('status', 'equalto', 'completed') | list | length }}</div>
                     <small>This year</small>
                 </div>
                 <div class="row-card">
-                    <h3>Points</h3>
-                    <div class="number">450</div>
-                    <small>Reward points</small>
+                    <h3>Hours Spent</h3>
+                    <div class="number">{{ bookings | map(attribute='duration') | sum }}</div>
+                    <small>total duration</small>
                 </div>
             </div>
 
@@ -68,29 +68,22 @@
                 <div class="left_column">
                     <div class="card">
                         <h3>Recent Bookings</h3>
+                        {% for booking in bookings[:5] %}
                         <div class="booking-item">
-                            <div><strong>Hotel Paradise - Deluxe Room</strong></div>
-                            <div>Check-in: Dec 15, 2024 | Check-out: Dec 18, 2024</div>
-                            <span class="status-badge status-confirmed">Confirmed</span>
+                            <!-- <div><strong>parking Address : {{ booking.parking_lot.address }}</strong></div> -->
+                            <div>Check-in: {{ booking.start_time }} | duration: {{ booking.duration }}</div>
+                            <span class="status-badge status-confirmed">{{ booking.status }}</span>
                         </div>
-                        <div class="booking-item">
-                            <div><strong>City Center Apartment</strong></div>
-                            <div>Check-in: Jan 20, 2025 | Check-out: Jan 22, 2025</div>
-                            <span class="status-badge status-pending">Pending</span>
-                        </div>
-                        <div class="booking-item">
-                            <div><strong>Mountain Resort Suite</strong></div>
-                            <div>Check-in: Nov 10, 2024 | Check-out: Nov 13, 2024</div>
-                            <span class="status-badge status-confirmed">Completed</span>
-                        </div>
+                        {% endfor %}
+                        
                     </div>
 
                     <div class="card">
                         <h3>Quick Actions</h3>
-                        <button class="login-btn" style="margin: 5px;">New Booking</button>
-                        <button class="login-btn" style="margin: 5px;">View All Bookings</button>
-                        <button class="login-btn" style="margin: 5px;">My Favorites</button>
-                        <button class="login-btn" style="margin: 5px;">Contact Support</button>
+                        <button class="" id="#search" style="margin: 5px;color: #fff;padding: 5px;border-radius: 5px;background-color: #c8d3e9;"><a href="#search">New Booking</a></button>
+                        <button class="" id="#history" style="margin: 5px;color: #fff;padding: 5px;border-radius: 5px;background-color: #c8cad0;"><a href="#history">View All Bookings</a></button>
+                        <button class="" id="#profile" style="margin: 5px;color: #fff;padding: 5px;border-radius: 5px;background-color: #ebedf3;"><a href="#profile">Profile</a></button>
+                        <button class="" id="#logout" style="margin: 5px;color: #fff;padding: 5px;border-radius: 5px;background-color: #fbfbfb;"><a href="/logout">Logout</a></button>
                     </div>
                 </div>
 
@@ -103,11 +96,11 @@
                         </div>
                         <div class="stat-item">
                             <span>Member Since</span>
-                            <span>Jan 2023</span>
+                            <span>{{user.created_at}}</span>
                         </div>
                         <div class="stat-item">
                             <span>Total Spent</span>
-                            <span>$2,450</span>
+                            <span>{{bookings.cost | sum}}</span>
                         </div>
                         <div class="stat-item">
                             <span>Loyalty Level</span>
@@ -118,19 +111,14 @@
                     <div class="card">
                         <h3>Notifications</h3>
                         <div class="activity-item">
-                            <strong>Booking Reminder</strong>
-                            <div>Check-in tomorrow at Hotel Paradise</div>
-                            <div class="activity-time">2 hours ago</div>
+                            <div><strong>Name:</strong> {{ user.username }}</div>
+                            <div><strong>Email:</strong> {{ user.email }}</div>
+                            <div><strong>address:</strong> {{ user.address }}</div>
                         </div>
                         <div class="activity-item">
-                            <strong>Special Offer</strong>
-                            <div>20% off on weekend bookings</div>
-                            <div class="activity-time">1 day ago</div>
-                        </div>
-                        <div class="activity-item">
-                            <strong>Points Earned</strong>
-                            <div>You earned 50 points from last booking</div>
-                            <div class="activity-time">3 days ago</div>
+                            <div><strong>create at:</strong> {{ user.created_at }}</div>
+                            <div><strong>Vehicle Number:</strong> {{ user.vehicle_number }}</div>
+                            <div><strong>Vehicle Type:</strong> {{ user.vehicle_type }}</div>
                         </div>
                     </div>
                 </div>
@@ -144,49 +132,50 @@
 <div class="search-booking" id="search-section">
     <h3>book parking spot</h3>
     <form action="/booking_lot" method="POST" class="search-form">
-        
-        <label for="vehicle_number">Vehicle Number</label>
-        <input type="text" name="vehicle_number" id="vehicle_number" placeholder="Vehicle Number" minlength="4" required>
+    
+    <label for="vehicle_number">Vehicle Number</label>
+    <input type="text" name="vehicle_number" id="vehicle_number" placeholder="Vehicle Number" minlength="4" required>
 
-        <label for="timing">Enter Time (in Hours)</label>
-        <input type="number" name="time" id="timing" placeholder="Enter Time in Hours" required min="1">
+    <label for="duration">Enter Time (in Hours)</label>
+    <input type="number" name="duration" id="duration" placeholder="Enter Time in Hours" required min="1">
+    
+    <label for="parking_lot_id" name="parking_lot">Select Location</label>
+    <select name="spot_id" id="parking_lot_id" required>        <option value="">Select Location</option>
+        {% for lot in parking_lots %}
+        <option value="{{ lot.id }}">{{ lot.prime_location_name }}</option>
+        {% endfor %}
+    </select>
 
-        <label for="location">Select Location</label>
-        <select name="location" id="location" required>
-            <option value="">Select Location</option>
-            <option value="location1">Location 1</option>
-            <option value="location2">Location 2</option>
-            <option value="location3">Location 3</option>
-            <option value="location4">Location 4</option>
-            <option value="location5">Location 5</option>
-        </select>
-
-        <label for="vehicle_type">Select Vehicle Type</label>
-        <select name="vehicle_type" id="vehicle_type" required>
-            <option value="">Select Vehicle Type</option>
-            <option value="car">Car</option>
-            <option value="motorcycle">Motorcycle</option>
-        </select>
-
-        <label for="spot_type">Select Spot Type</label>
-        <select name="spot_type" id="spot_type" required>
-            <option value="">Select Spot Type</option>
-            <option value="regular">Regular</option>
-            <option value="electric">Electric Chargeable</option>
-        </select>
-
-        <label for="user_id">User ID</label>
-        <input type="hidden" name="user_id" id="user_id" placeholder="User ID" value="{{ user_id }}"  required>
-
-        <button type="submit">Search</button>
-    </form>
+    <label for="vehicle_type">Select Vehicle Type</label>
+    <select name="vehicle_type" id="vehicle_type" required>
+        <option value="">Select Vehicle Type</option>
+        <option value="car">Car</option>
+        <option value="motorcycle">Motorcycle</option>
+    </select>
+    
+    <button type="submit">Book Parking</button>
+</form>
 </div>
-<div class="search-booking" id="search-section">
+<div class="search-book" id="search-section" style="margin-top: 20px;">
     <h3>view all booking</h3>
-    <form action="/view_all_booking" method="POST" class="search-form">
-        <input type="hidden" name="user_id" id="user_id" placeholder="User ID" value="{{ user_id }}"  required>
-        <button type="submit">book now</button>
-    </form>
+    {% for booking in bookings %}
+    <div class="booking-item">
+        <div><strong>Parking Address: {{ booking.parking_lot.address }}</strong></div>
+        <div>Check-in: {{ booking.start_time }} | Duration: {{ booking.duration }}</div>
+        <span class="status-badge status-confirmed">{{ booking.status }}</span>
+        <div><strong>Vehicle Number: {{ booking.vehicle_number }}</strong></div>
+        <div><strong>Vehicle Type: {{ booking.vehicle_type }}</strong></div>
+        <div><strong>Spot Type: {{ booking.spot_type }}</strong></div>
+        <div><strong>Cost: {{ booking.cost }}</strong></div>
+        <div class="release">
+            <form action="/release_booking" method="POST">
+                <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                <button type="submit" class="release-btn">Release Spot</button>
+            </form>
+        </div>
+    </div>
+    {%endfor%}
+    
     <div class="search-results">
 
     </div>
@@ -202,21 +191,13 @@
     <!-- history--- -->
     <div class="history" id="history">
         <h3>Recent Bookings</h3>
+        {% for booking in bookings[:5] %}
         <div class="booking-item">
-            <div><strong>Hotel Paradise - Deluxe Room</strong></div>
-            <div>Check-in: Dec 15, 2024 | Check-out: Dec 18, 2024</div>
-            <span class="status-badge status-confirmed">Confirmed</span>
+            <div><strong>parking Address : {{ booking.parking_lot.address }}</strong></div>
+            <div>Check-in: {{ booking.start_time }} | duration: {{ booking.duration }}</div>
+            <span class="status-badge status-confirmed">{{ booking.status }}</span>
         </div>
-        <div class="booking-item">
-            <div><strong>City Center Apartment</strong></div>
-            <div>Check-in: Jan 20, 2025 | Check-out: Jan 22, 2025</div>
-            <span class="status-badge status-pending">Pending</span>
-        </div>
-        <div class="booking-item">
-            <div><strong>Mountain Resort Suite</strong></div>
-            <div>Check-in: Nov 10, 2024 | Check-out: Nov 13, 2024</div>
-            <span class="status-badge status-confirmed">Completed</span>
-        </div>
+        {% endfor %}
     </div>
     <div class="profile-edit" id="profile">
     <h3>Edit Profile</h3>
