@@ -1,5 +1,20 @@
+// Admin Dashboard JavaScript - Essential Functions Only
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate progress bars on load
+    const progressBars = document.querySelectorAll('.progress-fill');
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 500);
+    });
+});
 
+// ===== PARKING LOT MANAGEMENT =====
+
+// Search functionality for parking lots
 document.getElementById('searchInput').addEventListener('input', function() {
     const searchTerm = this.value.toLowerCase();
     const searchBy = document.getElementById('searchBy').value;
@@ -23,28 +38,6 @@ document.getElementById('searchInput').addEventListener('input', function() {
     });
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Animate progress bars on load
-    const progressBars = document.querySelectorAll('.progress-fill');
-    progressBars.forEach(bar => {
-        const width = bar.style.width;
-        bar.style.width = '0%';
-        setTimeout(() => {
-            bar.style.width = width;
-        }, 500);
-    });
-});
-
-// User Edit Functions
-function openUserEditPopup(userId, name, email, password,address) {
-    document.getElementById('editUserId').value = userId;
-    document.getElementById('editUserName').value = name;
-    document.getElementById('editUserEmail').value = email;
-    document.getElementById('editUserPassword').value =password || '';
-    document.getElementById('editUserAddress').value = address || '';
-    document.getElementById('userEditPopup').classList.add('active');
-}
-
 // Parking Lot Edit Functions
 function openLotEditPopup(lotId, lotName, location, pinCode, totalSpots, lotCost) {
     document.getElementById('editLotId').value = lotId;
@@ -63,26 +56,15 @@ function deleteLot(lotId, lotName) {
     }
 }
 
-// Close popup function
-function closePopup(popupId) {
-    document.getElementById(popupId).classList.remove('active');
-}
-
-// Close popup when clicking outside
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('popup-overlay')) {
-        e.target.classList.remove('active')
-    }
-});
 // Create Parking Lot Functions
 function openCreateLotPopup() {
     document.getElementById('createLotForm').reset();
-document.getElementById('createLotPopup').classList.add('active');
+    document.getElementById('createLotPopup').classList.add('active');
 }
 
+// Form validation for create lot
 document.getElementById('createLotForm').addEventListener('submit', function(e) {
-    // You can add validation here if needed
-    const totalSpaces = document.getElementById('createTotalSpaces').value
+    const totalSpaces = document.getElementById('createTotalSpaces').value;
     const pricePerHour = document.getElementById('createPricePerHour').value;
     
     if (totalSpaces < 1) {
@@ -96,34 +78,9 @@ document.getElementById('createLotForm').addEventListener('submit', function(e) 
         e.preventDefault();
         return;
     }
-    
-    // Form will submit to /lot_create route
 });
 
-// Open Users Popup
-function openUsersPopup() {
-    document.getElementById('usersPopup').classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-// Close Users Popup
-function closeUsersPopup() {
-    document.getElementById('usersPopup').classList.remove('active')
-    document.body.style.overflow = 'auto';
-}
-
-// Create User Functions
-function openCreateUserPopup() {
-    document.getElementById('createUserForm').reset();
-    document.getElementById('createUserPopup').classList.add('active');
-}
-
-// Delete User Functions
-function deleteUser(userId, userName) {
-    document.getElementById('deleteUserId').value = userId
-    document.getElementById('deleteUserName').textContent = userName
-    document.getElementById('deleteUserPopup').classList.add('active')
-}
+// ===== USER MANAGEMENT =====
 
 // User Search Functionality
 document.getElementById('userSearchInput').addEventListener('input', function() {
@@ -149,36 +106,67 @@ document.getElementById('userSearchInput').addEventListener('input', function() 
     });
 });
 
-// Close popup when clicking outside content area
-document.getElementById('usersPopup').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeUsersPopup();
-    }
-});
+// User Edit Functions
+function openUserEditPopup(userId, name, email, password, address) {
+    document.getElementById('editUserId').value = userId;
+    document.getElementById('editUserName').value = name;
+    document.getElementById('editUserEmail').value = email;
+    document.getElementById('editUserPassword').value = password || '';
+    document.getElementById('editUserAddress').value = address || '';
+    document.getElementById('userEditPopup').classList.add('active');
+}
 
-// Close popup with Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && document.getElementById('usersPopup').classList.contains('active')) {
-        closeUsersPopup();
-    }
-});
-// Open Booking Popup
-function openBookingPopup() {
-    document.getElementById('bookingPopup').classList.add('active');
+// Delete User Functions
+function deleteUser(userId, userName) {
+    document.getElementById('deleteUserId').value = userId;
+    document.getElementById('deleteUserName').textContent = userName;
+    document.getElementById('deleteUserPopup').classList.add('active');
+}
+
+// Create User Functions
+function openCreateUserPopup() {
+    document.getElementById('createUserForm').reset();
+    document.getElementById('createUserPopup').classList.add('active');
+}
+
+// Open/Close Users Popup
+function openUsersPopup() {
+    document.getElementById('usersPopup').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-// Close Booking Popup
-function closeBookingPopup() {
-    document.getElementById('bookingPopup').classList.remove('active');
+function closeUsersPopup() {
+    document.getElementById('usersPopup').classList.remove('active');
     document.body.style.overflow = 'auto';
 }
 
-// Create Booking Functions
-function openCreateBookingPopup() {
-    document.getElementById('createBookingForm').reset();
-    document.getElementById('createBookingPopup').classList.add('active');
-}
+// ===== BOOKING MANAGEMENT =====
+
+// Booking Search Functionality
+document.getElementById('bookingSearchInput').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const statusFilter = document.getElementById('bookingSearchBy').value;
+    const bookingCards = document.querySelectorAll('.booking-card');
+    
+    bookingCards.forEach(card => {
+        let shouldShow = false;
+        
+        // Filter by status
+        if (statusFilter === 'all') {
+            shouldShow = true;
+        } else {
+            shouldShow = card.dataset.status === statusFilter;
+        }
+        
+        // Filter by search term
+        if (shouldShow && searchTerm !== '') {
+            const cardText = card.textContent.toLowerCase();
+            shouldShow = cardText.includes(searchTerm);
+        }
+        
+        card.style.display = shouldShow ? 'block' : 'none';
+    });
+});
 
 // Booking Action Functions
 function editBooking(bookingId) {
@@ -210,43 +198,59 @@ function viewBookingDetails(bookingId) {
     alert('Viewing details for booking: ' + bookingId + '\n(This would open a detailed view)');
 }
 
-// Booking Search Functionality
-document.getElementById('bookingSearchInput').addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase();
-    const statusFilter = document.getElementById('bookingSearchBy').value;
-    const bookingCards = document.querySelectorAll('.booking-card');
-    
-    bookingCards.forEach(card => {
-        let shouldShow = false;
-        
-        // Filter by status
-        if (statusFilter === 'all') {
-            shouldShow = true;
-        } else {
-            shouldShow = card.dataset.status === statusFilter;
-        }
-        
-        // Filter by search term
-        if (shouldShow && searchTerm !== '') {
-            const cardText = card.textContent.toLowerCase();
-            shouldShow = cardText.includes(searchTerm);
-        }
-        
-        card.style.display = shouldShow ? 'block' : 'none';
-    });
+// Create Booking Functions
+function openCreateBookingPopup() {
+    document.getElementById('createBookingForm').reset();
+    document.getElementById('createBookingPopup').classList.add('active');
+}
+
+// Open/Close Booking Popup
+function openBookingPopup() {
+    document.getElementById('bookingPopup').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeBookingPopup() {
+    document.getElementById('bookingPopup').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+// ===== UTILITY FUNCTIONS =====
+
+// Close popup function
+function closePopup(popupId) {
+    document.getElementById(popupId).classList.remove('active');
+}
+
+// Close popup when clicking outside
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('popup-overlay')) {
+        e.target.classList.remove('active');
+    }
 });
 
-// Close booking popup when clicking outside content area
+// Close popup when clicking outside content area
+document.getElementById('usersPopup').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeUsersPopup();
+    }
+});
+
 document.getElementById('bookingPopup').addEventListener('click', function(e) {
     if (e.target === this) {
         closeBookingPopup();
     }
 });
 
-// Close booking popup with Escape key
+// Close popup with Escape key
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && document.getElementById('bookingPopup').classList.contains('active')) {
-        closeBookingPopup();
+    if (e.key === 'Escape') {
+        if (document.getElementById('usersPopup').classList.contains('active')) {
+            closeUsersPopup();
+        }
+        if (document.getElementById('bookingPopup').classList.contains('active')) {
+            closeBookingPopup();
+        }
     }
 });
         

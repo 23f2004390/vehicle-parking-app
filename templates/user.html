@@ -23,7 +23,8 @@
             </div>
             <div class="nav">
                 <nav class="nav-item"><a href="#dashboard">📊 Dashboard</a></nav>
-                <div class="nav-item"><a href="#search">🔎 Search</a></div>
+                <div class="nav-item"><a href="#search-box">📑 Booking</a></div>
+                <div class="nav-item"><a href="#my-bookings">🔎 Search</a></div>
                 <div class="nav-item"><a href="#history">📒 History</a></div>
                 <div class="nav-item"><a href="#profile">🙎 Profile</a></div>
                 <div class="nav-item"><a href="/logout"><i class="ri-login-box-fill" style="font-size: 2rem;"></i> Logout</a></div>
@@ -43,9 +44,9 @@
 
             <div class="four-row">
                 <div class="row-card">
-                    <h3>My Bookings</h3>
-                    <div class="number">{{ bookings | length }}</div>
-                    <small>Total bookings</small>
+                    <h3>Active Bookings</h3>
+                    <div class="number">{{ bookings | selectattr('status', 'equalto', 'active') | list | length }}</div>
+                    <small>Currently active</small>
                 </div>
                 <div class="row-card">
                     <h3>Upcoming</h3>
@@ -65,13 +66,15 @@
             </div>
             <div class="content">
                 <div class="left_column">
-                    <div class="card">
+                    <div class="card" style="height: 50vh; overflow-y: auto;">
                         <h3>Recent Bookings</h3>
-                        {% for booking in bookings[:5] %}
+                        {% for booking in bookings if booking.status.value == 'active' %}
                         <div class="booking-item">
-                            <div><strong>parking Address : {{parking_lots.address}}</strong></div>
-                            <div>Check-in: {{ booking.start_time }} | duration: {{ booking.duration }}</div>
-                            <span class="status-badge status-confirmed">{{ booking.status }}</span>
+                            <div><strong>Vehicle:</strong> {{ booking.vehicle_number }} ({{ booking.vehicle_type }})</div>
+                            <div><strong>Location:</strong> {{ booking.Parking_spot.Parking_lot.prime_location_name if booking.Parking_spot and booking.Parking_spot.Parking_lot else 'N/A' }}</div>
+                            <div>Check-in: {{ booking.start_time.strftime('%Y-%m-%d %H:%M') }} | Duration: {{ booking.duration }} hours</div>
+                            <div><strong>Cost:</strong> ₹{{ booking.total_cost }}</div>
+                            <span class="status-badge status-{{ booking.status }}" style="color: #1548ad; background-color: #d4edda; border-radius: 5px; padding: 5px; margin: 5px;">{{ booking.status | capitalize }}</span>
                         </div>
                         {% endfor %}
                         
@@ -95,11 +98,11 @@
                         </div>
                         <div class="stat-item">
                             <span>Member Since</span>
-                            <span>{{user.created_at}}</span>
+                            <span>{{user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A'}}</span>
                         </div>
                         <div class="stat-item">
                             <span>Total Spent</span>
-                            <span>{{bookings.cost | sum}}</span>
+                            <span>₹{{ bookings | map(attribute='total_cost') | sum | round(2) }}</span>
                         </div>
                         <div class="stat-item">
                             <span>Loyalty Level</span>
@@ -112,12 +115,12 @@
                         <div class="activity-item">
                             <div><strong>Name:</strong> {{ user.username }}</div>
                             <div><strong>Email:</strong> {{ user.email }}</div>
-                            <div><strong>address:</strong> {{ user.address }}</div>
+                            <div><strong>Address:</strong> {{ user.address if user.address != 'None' else 'Not provided' }}</div>
                         </div>
                         <div class="activity-item">
-                            <div><strong>create at:</strong> {{ user.created_at }}</div>
-                            <div><strong>Vehicle Number:</strong> {{ user.vehicle_number }}</div>
-                            <div><strong>Vehicle Type:</strong> {{ user.vehicle_type }}</div>
+                            <div><strong>Created at:</strong> {{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}</div>
+                            <div><strong>Total Bookings:</strong> {{ bookings | length }}</div>
+                            <div><strong>Account Type:</strong> {{ 'Admin' if user.is_admin else 'User' }}</div>
                         </div>
                     </div>
                 </div>
@@ -125,64 +128,104 @@
         </div>
     </div>
 
+<!-- ----------------------search section--------- -->
 
 
-<div class="search-book" id="search">
-<div class="search-booking" id="search-section">
-    <h3>book parking spot</h3>
-    <form action="/booking_lot" method="POST" class="search-form">
-    
-    <label for="vehicle_number">Vehicle Number</label>
-    <input type="text" name="vehicle_number" id="vehicle_number" placeholder="Vehicle Number" minlength="4" required>
+<div class="search-book" id="search-box">
 
-    <label for="duration">Enter Time (in Hours)</label>
-    <input type="number" name="duration" id="duration" placeholder="Enter Time in Hours" required min="1">
-    
-    <label for="parking_lot_id" name="parking_lot">Select Location</label>
-    <select name="spot_id" id="parking_lot_id" required>        <option value="">Select Location</option>
-        {% for lot in parking_lots %}
-        <option value="{{ lot.id }}">{{ lot.prime_location_name }}</option>
-        {% endfor %}
-    </select>
+    <div class="booking-form-section" id="booking-form">
+        <h3>Book Parking Spot</h3>
+        <form action="/booking_lot" method="POST" class="booking-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="vehicle_number">Vehicle Number</label>
+                    <input type="text" name="vehicle_number" id="vehicle_number" placeholder="Vehicle Number" minlength="4" required>
+                </div>
 
-    <label for="vehicle_type">Select Vehicle Type</label>
-    <select name="vehicle_type" id="vehicle_type" required>
-        <option value="">Select Vehicle Type</option>
-        <option value="car">Car</option>
-        <option value="motorcycle">Motorcycle</option>
-    </select>
-    
-    <button type="submit">Book Parking</button>
-</form>
-</div>
-<div class="search-book" id="search-section" style="margin-top: 20px;">
-    <h3>view all booking</h3>
-    {% for booking in bookings %}
-    <div class="booking-item">
-        <div><strong>Parking Address: {{ parking_lots.address}}</strong></div>
-        <div>Check-in: {{ booking.start_time }} | Duration: {{ booking.duration }}</div>
-        <span class="status-badge status-confirmed">{{ booking.status }}</span>
-        <div><strong>Vehicle Number: {{ booking.vehicle_number }}</strong></div>
-        <div><strong>Vehicle Type: {{ booking.vehicle_type }}</strong></div>
-        <div><strong>Spot Type: {{ booking.spot_type }}</strong></div>
-        <div><strong>Cost: {{ booking.cost }}</strong></div>
-        <div class="release">
-            <form action="/release_booking" method="POST">
-                <input type="hidden" name="booking_id" value="{{ booking.id }}">
-                <button type="submit" class="release-btn">Release Spot</button>
-            </form>
+                <div class="form-group">
+                    <label for="duration">Duration (Hours)</label>
+                    <input type="number" name="duration" id="duration" placeholder="Enter Hours" required min="1">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="parking_lot_id">Select Location</label>
+                    <select name="spot_id" id="parking_lot_id" required>
+                        <option value="">Select Location</option>
+                        {% for lot in parking_lots %}
+                        <option value="{{ lot.id }}" data-location="{{ lot.address }}" data-name="{{ lot.prime_location_name }}">{{ lot.prime_location_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="vehicle_type">Vehicle Type</label>
+                    <select name="vehicle_type" id="vehicle_type" required>
+                        <option value="">Select Vehicle Type</option>
+                        <option value="car">Car</option>
+                        <option value="motorcycle">Motorcycle</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn">Book Parking</button>
+        </form>
+    </div>
+
+    <!-- My Bookings Section -->
+    <div class="my-bookings-section" id="my-bookings">
+        <h3>My Bookings</h3>
+        
+        <!-- Booking Search Bar -->
+        <div class="booking-search-container">
+            <div class="search-controls">
+                <select class="search-dropdown" id="bookingSearchBy">
+                    <option value="vehicle_number">Search by Vehicle Number</option>
+                    <option value="status">Search by Status</option>
+                    <option value="date">Search by Date</option>
+                    <option value="location">Search by Location</option>
+                </select>
+                <input type="text" class="search-input" id="bookingSearchInput" placeholder="Search your bookings...">
+                <button type="button" class="clear-search-btn" id="clearBookingSearch">Clear</button>
+            </div>
         </div>
-    </div>
-    {%endfor%}
-    
-    <div class="search-results">
-
+        
+        <div class="bookings-grid" id="bookingsGrid">
+            {% for booking in bookings %}
+            <div class="booking-card" 
+                 data-vehicle="{{ booking.vehicle_number }}"
+                 data-status="{{ booking.status.value }}"
+                 data-date="{{ booking.start_time.strftime('%Y-%m-%d') }}"
+                 data-location="{{ booking.Parking_spot.Parking_lot.prime_location_name if booking.Parking_spot and booking.Parking_spot.Parking_lot else '' }}">
+                <div class="booking-header">
+                    <span class="booking-id">#{{ booking.id }}</span>
+                    <span class="booking-status status-{{ booking.status }}">{{ booking.status | capitalize }}</span>
+                </div>
+                <div class="booking-info">
+                    <p><strong>Vehicle:</strong> {{ booking.vehicle_number }} ({{ booking.vehicle_type }})</p>
+                    <p><strong>Duration:</strong> {{ booking.duration }} hours</p>
+                    <p><strong>Started:</strong> {{ booking.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                    <p><strong>Cost:</strong> ₹{{ booking.total_cost }}</p>
+                    {% if booking.Parking_spot and booking.Parking_spot.Parking_lot %}
+                    <p><strong>Location:</strong> {{ booking.Parking_spot.Parking_lot.prime_location_name }}</p>
+                    {% endif %}
+                </div>
+                {% if booking.status.value == 'active' %}
+                <div class="booking-actions">
+                    <form action="/release_booking" method="POST">
+                        <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                        <button type="submit" class="release-btn">Release Spot</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        
     </div>
 </div>
-</div>
-
-
-
 
 
 
@@ -192,9 +235,10 @@
         <h3>Recent Bookings</h3>
         {% for booking in bookings[:5] %}
         <div class="booking-item">
-            <div><strong>parking Address : {{ parking_lots.address }}</strong></div>
-            <div>Check-in: {{ booking.start_time }} | duration: {{ booking.duration }}</div>
-            <span class="status-badge status-confirmed">{{ booking.status }}</span>
+            <div><strong>Vehicle:</strong> {{ booking.vehicle_number }} ({{ booking.vehicle_type }})</div>
+            <div>Check-in: {{ booking.start_time.strftime('%Y-%m-%d %H:%M') }} | Duration: {{ booking.duration }} hours</div>
+            <div><strong>Cost:</strong> ₹{{ booking.total_cost }}</div>
+            <span class="status-badge status-{{ booking.status }}">{{ booking.status | capitalize }}</span>
         </div>
         {% endfor %}
     </div>
@@ -205,22 +249,17 @@
     <form action="/update-profile" method="POST" class="profile-form">
         <div class="form-group">
             <label for="username">Username:</label>
-            <input type="text" name="username" id="username" value="user123" class="profile-input" required>
+            <input type="text" name="username" id="username" value="{{ user.username }}" class="profile-input" required>
         </div>
         
         <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" name="email" id="email" value="user123@example.com" class="profile-input" required>
+            <input type="email" name="email" id="email" value="{{ user.email }}" class="profile-input" required>
         </div>
         
         <div class="form-group">
-            <label for="phone">Phone Number:</label>
-            <input type="tel" name="phone" id="phone" placeholder="Enter phone number" class="profile-input">
-        </div>
-        
-        <div class="form-group">
-            <label for="fullname">Full Name:</label>
-            <input type="text" name="fullname" id="fullname" placeholder="Enter full name" class="profile-input">
+            <label for="address">Address:</label>
+            <textarea name="address" id="address" placeholder="Enter your address" class="profile-input">{{ user.address if user.address != 'None' else '' }}</textarea>
         </div>
         
         <!-- Action Buttons for Profile -->
@@ -255,5 +294,7 @@
         </div>
     </form>
 </div>
+<script src="{{ url_for('static', filename='js/user.js') }}"></script>
+<script src="{{ url_for('static', filename='js/user_search.js') }}"></script>
 </body>
 </html>
