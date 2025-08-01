@@ -519,7 +519,7 @@ if __name__ == '__main__':
         
         # Create admin user if not exists
         if not User.query.filter_by(username='admin').first():
-            admin_user = User(username='admin', password='admin', email='admin@example.com', address="admin", is_admin=True)
+            admin_user = User(username='admin', password='admin', email='admin@test.com', address="admin", is_admin=True)
             db.session.add(admin_user)
             db.session.commit()
     

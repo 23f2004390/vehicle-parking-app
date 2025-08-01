@@ -1,340 +1,201 @@
-# Vehicle Parking Management System
+# Vehicle Parking App - Project Overview and Guide
 
-**Project Submission**  
-**Course:** MAD 1 
-**Name:** RITURAJ
-**Roll Number:** 23f2004390
+## Project Name: WhereMyCarApp
 
-## 📋 Project Overview
+This project is a web-based Vehicle Parking App designed to simplify the process of finding and booking parking spots. It provides a user-friendly platform for drivers to locate available spaces and for administrators to manage the parking lot efficiently. The system is built with Python, Flask, and SQLAlchemy.
 
-This is a web-based parking management system developed as part of my academic curriculum. The application is built using Flask framework and provides a complete solution for managing parking spaces in various locations. The system allows users to book parking spots, manage their bookings, and provides administrators with tools to oversee the entire parking operation.
+## About
 
-### Objectives
-- To develop a user-friendly parking booking system
-- To provide comprehensive admin management features
-- To demonstrate proficiency in web development technologies
+**Name:** RITURAJ  
+**Student ID / Roll Number:** 23f2004390  
+**Email ID:** 23f2004390@ds.study.iitm.ac.in  
+**Course:** MAD 1 projects (vehicle parking app)
 
-## 🚗 Features
+This application was created as part of the curriculum requirements, demonstrating skills in web development, database management, and backend programming.
+
+## Key Features
+
+### Two Main Parts
+The application provides separate views for users and administrators.
 
 ### User Features
-- **User Registration & Authentication**: Secure login and registration system
-- **Parking Spot Booking**: Reserve parking spots with vehicle details
-- **Real-time Availability**: Check parking spot availability 
-- **Booking Management**: View, modify, and cancel existing bookings
-- **Profile Management**: Update personal information and change passwords
-- **Feedback System**: Submit feedback and ratings for parking lots
-- **Multiple Vehicle Types**: Support for different vehicle types (Car, Bike, etc.)
+- **Account Management:** Easy sign-up and login functionality
+- **Parking Search:** View the list of available parking spots and book one
+- **Booking System:** Book an available spot for a specific duration
+- **History:** View past and active parking spot bookings
+- **Profile Management:** Update personal information and password
+- **Feedback System:** Submit feedback about the service
 
-### Admin Features
-- **User Management**: Create, edit, and delete user accounts
-- **Parking Lot Management**: Add, modify, and remove parking lots
-- **Spot Management**: Configure parking spots (regular and electric)
-- **Booking Oversight**: Monitor and manage all bookings
-- **System Analytics**: View parking lot statistics and usage data
+### Administrator Features
+- **Secure Login:** Using sessions, secure login for the management dashboard for both user and admin
+- **Lot Overview:** See the status of all parking spots at a glance (occupied vs free)
+- **User Management:** View and manage all registered user accounts
+- **Booking Tracking:** Monitor all active and past bookings
+- **Parking Lot Management:** Create, update, and delete parking lots
+- **Manual Updates:** Manually change the status of any parking spot
+- **Bulk Operations:** Release all bookings at once
 
-### Technical Features
-- **Responsive Design**: Modern, mobile-friendly interface
-- **Database Management**: SQLite database with SQLAlchemy ORM
-- **Session Management**: Secure user session handling
-- **Flash Messages**: User-friendly notification system
-- **Enum-based Status Tracking**: Structured booking and spot status management
+## The Technology Behind the App
 
-## 🛠️ Technology Stack
+### Backend (The Engine)
+- Built with **Python** and the **Flask** framework (Core functionality)
+- Handles all server-side logic, including user management, booking processing, and database communication
+- Uses **Flask-SQLAlchemy** for ORM and database operations
 
-### Programming Languages & Frameworks
-- **Python 3.13+**: Core programming language
-- **Flask**: Web framework for backend development
-- **SQLAlchemy**: Object-Relational Mapping (ORM) for database operations
+### Frontend (What You See)
+- **HTML:** Provides the basic structure of the web pages
+- **CSS:** Used for all styling, including colors, fonts, and layout
+- **JavaScript:** Makes the pages interactive and dynamic
 
 ### Database
-- **SQLite**: Lightweight, serverless database for data storage
+- Uses **SQLite**
+- Stores all user information, parking spot data, booking records, and parking lot information
 
-### Frontend Technologies
-- **HTML5**: Structure and content
-- **CSS3**: Styling and responsive design
-- **JavaScript**: Client-side interactivity
-- **Remix Icons**: Modern icon library
-
-### Development Tools
-- **uv**: Modern Python package manager
-- **Git**: Version control system
-
-### Learning Outcomes
-Through this project, I have gained hands-on experience with:
-- Web application development using Flask
-- Database design and management
-- Frontend development with HTML, CSS, and JavaScript
-- User authentication and session management
-- Responsive web design principles
-- Project structure organization
-
-## 📋 Prerequisites
-
-- Python 3.13 or higher
-- uv package manager (recommended) or pip
-- Modern web browser
-
-## 🚀 Installation & Setup
+## How to Get the App Running
 
 ### Prerequisites
-- Python 3.13 or higher installed on your system
-- Basic knowledge of command line operations
-- A modern web browser (Chrome, Firefox, Safari, Edge)
+Make sure you have Python installed on your system, then install the required packages:
 
-### Step-by-Step Installation
+```bash
+pip install Flask Flask-SQLAlchemy
+```
 
-1. **Download/Clone the Project**
-   ```bash
-   # If using Git
-   git clone <repository-url>
-   cd parking_app_23f2004390
-   
-   # Or download and extract the ZIP file
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   # Method 1: Using uv (recommended)
-   uv sync
-   
-   # Method 2: Using pip
-   pip install flask flask-sqlalchemy flask-login flask-restful
-   ```
-
-3. **Run the Application**
+### Start the Application
+1. Navigate to the project directory in your terminal
+2. Run the following command:
    ```bash
    python main.py
    ```
 
-4. **Access the Application**
-   - Open your web browser
-   - Navigate to: `http://localhost:5000`
-   - The application will automatically create the database on first run
+### Use the App in Your Browser
+- The terminal will show the server is running, usually at `http://127.0.0.1:5000/`
+- Open this address in your web browser to see the application's landing page
 
-### Troubleshooting
-- **Port already in use**: Change the port in `main.py` or close other applications using port 5000
-- **Module not found**: Ensure all dependencies are installed correctly
-- **Database errors**: Delete the `instance/site.db` file and restart the application
+### Default Admin Access
+- **Username:** admin
+- **Password:** admin
+- **Email:** admin@test.com
 
-## 📁 Project Structure
+## Database Schema
 
-```
-parking_app_23f2004390/
-├── main.py                 # Main Flask application
-├── pyproject.toml         # Project configuration and dependencies
-├── README.md              # This documentation file
-├── .gitignore            # Git ignore rules
-├── templates/            # HTML templates
-│   ├── landing.html      # Landing page with login/register
-│   ├── user.html         # User dashboard
-│   └── admin.html        # Admin dashboard
-├── static/               # Static assets
-│   ├── css/             # Stylesheets
-│   ├── js/              # JavaScript files
-│   └── images/          # Image assets
-└── instance/            # Instance-specific files (database)
-    └── site.db          # SQLite database
-```
+The database consists of four main tables to manage the application's data:
 
-## 🗄️ Database Schema
-
-### Core Models
-
-#### User
-- `id`: Primary key
-- `username`: Unique username
-- `password`: User password
-- `email`: Unique email address
-- `address`: User address
-- `is_admin`: Admin privileges flag
-- `feedback`: User feedback
+### User Table
+Stores information about registered users.
+- `id`: Unique ID for each user (Primary Key)
+- `username`: The user's unique name for logging in
+- `email`: The user's unique email address
+- `password`: The user's password
+- `address`: User's address (optional)
+- `is_admin`: A flag to check if the user is an administrator (True/False)
+- `feedback`: User feedback storage
 - `created_at`: Account creation timestamp
 
-#### Parking_lot
-- `id`: Primary key
-- `prime_location_name`: Location name
-- `address`: Physical address
-- `pin_code`: Postal code
-- `total_spots`: Total parking spots
+### Parking Lot Table
+Stores information about each parking facility.
+- `id`: Unique ID for each parking lot (Primary Key)
+- `prime_location_name`: Short name or nickname
+- `address`: The address or description of the lot's location
+- `pin_code`: Postal code of the location
+- `total_spots`: Total number of parking spots
 - `electric_spots`: Number of electric vehicle spots
 - `available_spots`: Currently available spots
-- `rating`: Average rating
-- `parking_cost`: Cost per hour
+- `rating`: Average rating of the parking lot
+- `parking_cost`: Cost per hour for parking
 
-#### Parking_spot
-- `id`: Primary key
-- `is_occupied`: Availability status
-- `lot_id`: Foreign key to Parking_lot
-- `spot_type`: Regular or Electric
+### Parking Spot Table
+Stores information about each individual spot within a lot.
+- `id`: Unique ID for each parking spot (Primary Key)
+- `lot_id`: Links to the Parking Lot this spot belongs to (Foreign Key)
+- `is_occupied`: A flag to check if the spot is currently occupied (True/False)
+- `spot_type`: Type of spot (regular/electric)
 
-#### Booking
-- `id`: Primary key
-- `user_id`: Foreign key to User
-- `spot_id`: Foreign key to Parking_spot
-- `vehicle_number`: License plate
-- `vehicle_type`: Type of vehicle
-- `start_time`: Booking start time
-- `duration`: Duration in hours
-- `status`: Active/Completed/Cancelled
-- `total_cost`: Total booking cost
+### Booking Table
+Links users to the parking spots they have booked.
+- `id`: Unique ID for each booking (Primary Key)
+- `user_id`: The ID of the user who made the booking (links to the User table)
+- `spot_id`: The ID of the parking spot that was booked (links to the Parking Spot table)
+- `vehicle_number`: License plate number of the vehicle
+- `vehicle_type`: Type of vehicle (Car, Bike, etc.)
+- `start_time`: The date and time when the booking begins
+- `duration`: Duration of booking in hours
+- `status`: Current status (active/completed/cancelled)
+- `total_cost`: Total cost of the booking
 
-## 🎯 How to Use the Application
+## File Structure
 
-### For Regular Users
+The project is organized into several key folders and files:
 
-1. **Registration**
-   - Click "Sign Up" on the landing page
-   - Enter a unique username, email, and password
-   - Submit the registration form
-
-2. **Login**
-   - Enter your username and password
-   - Click "Login" to access your dashboard
-
-3. **Book a Parking Spot**
-   - Browse available parking lots
-   - Select a parking lot and view available spots
-   - Choose your vehicle type and duration
-   - Enter your vehicle number
-   - Confirm the booking
-
-4. **Manage Your Bookings**
-   - View all your current and past bookings
-   - Cancel active bookings if needed
-   - Check booking status and costs
-
-5. **Profile Management**
-   - Update your personal information
-   - Change your password
-   - Provide feedback on parking lots
-
-### For Administrators
-
-1. **Admin Access**
-   - Login with admin credentials
-   - Access the admin dashboard
-
-2. **User Management**
-   - View all registered users
-   - Create new user accounts
-   - Edit user information
-   - Delete user accounts
-
-3. **Parking Lot Management**
-   - Add new parking locations
-   - Configure parking spots (regular/electric)
-   - Set parking rates
-   - Monitor availability
-
-4. **System Overview**
-   - View booking statistics
-   - Monitor system usage
-   - Manage all bookings
-
-## 🔧 Technical Implementation
-
-### Database Design
-The application uses a relational database with four main tables:
-- **Users**: Store user information and authentication details
-- **Parking Lots**: Store parking location information
-- **Parking Spots**: Individual parking spaces within lots
-- **Bookings**: Track all parking reservations
-
-### Key Features Implementation
-1. **User Authentication**: Session-based login system
-2. **Real-time Availability**: Dynamic spot status updates
-3. **Booking System**: Complete reservation management
-4. **Admin Panel**: Comprehensive management interface
-5. **Responsive Design**: Mobile-friendly user interface
-
-### Code Organization
-- **Models**: Database table definitions using SQLAlchemy
-- **Routes**: Flask route handlers for different pages
-- **Templates**: HTML files for user interface
-- **Static Files**: CSS, JavaScript, and images
-
-## 🔒 Security & Limitations
-
-### Current Security Features
-- **Session Management**: Secure user session handling
-- **Input Validation**: Form data validation and sanitization
-- **SQL Injection Protection**: Uses SQLAlchemy ORM for safe database queries
-- **User Authentication**: Login/logout functionality
-
-### Known Limitations (For Academic Purposes)
-- **Password Storage**: Passwords are stored in plain text
-- **Basic Security**: This is a learning project with basic security measures
-- **Local Database**: Uses SQLite
-
-
-
-## 🚀 Running the Application
-
-### Development Mode
-```bash
-python main.py
 ```
-The application will start on `http://localhost:5000`
+/
+|-- main.py                 # Main Flask application file
+|-- instance/
+|   |-- site.db             # SQLite database file
+|-- static/
+|   |-- css/                # Stylesheets for the application
+|   |   |-- admin.css
+|   |   |-- landing.css
+|   |   `-- user.css
+|   |-- js/                 # JavaScript files for interactivity
+|   |   |-- dashboard.js
+|   |   |-- landing.js
+|   |   |-- user.js
+|   |   `-- user_search.js
+|   `-- images/             # Image assets used in the app
+|       |-- available_spot.jpg
+|       |-- bg_landing_page.jpg
+|       |-- landing-page.png
+|       |-- parking_ui.png
+|       `-- phone_parking.jpg
+|-- templates/              # HTML templates for different pages
+|   |-- admin.html          # Admin dashboard page
+|   |-- landing.html        # Main landing page
+|   `-- user.html           # User dashboard page
+|-- .python-version         # Specifies the Python version
+`-- README.md               # Project documentation
+```
 
-### Testing the Application
-1. **User Testing**:
-   - Register a new account
-   - Login and explore the user dashboard
-   - Try booking a parking spot
-   - Test profile management features
 
-2. **Admin Testing**:
-   - Login with admin credentials
-   - Test user management features
-   - Add/modify parking lots
-   - Monitor system statistics
 
-### Demo Credentials (For Testing)
-- **Regular User**: Register a new account
-- **Admin User**: Create an admin account through the database or code
+## Application Features
+### User Registration and Authentication
+- New users can register with username, email, and password
+- Secure login system with session management
+- Password change functionality for existing users
 
-### Screenshots
-Include screenshots of key features here:
-- Landing page
-- User dashboard
-- Admin panel
-- Booking interface
+### Parking Lot Management (Admin)
+- Create new parking lots with location details
+- Edit existing parking lot information
+- Delete parking lots (with proper booking cleanup)
+- View all parking lots with availability status
 
-## 📚 Academic Context
+### Booking System
+- Users can book available parking spots
+- Real-time availability updates
+- Cost calculation based on duration and hourly rate
+- Booking history tracking
 
-### Learning Objectives Achieved
-- **Web Development**: Practical experience with Flask framework
-- **Database Management**: Design and implementation of relational databases
-- **Frontend Development**: HTML, CSS, and JavaScript integration
-- **User Interface Design**: Responsive and user-friendly design principles
-- **Project Management**: Complete software development lifecycle
+### Administrative Controls
+- User management (create, edit, delete users)
+- Booking oversight and management
+- System-wide operations (release all bookings)
+- Comprehensive dashboard with statistics
 
-### Skills Demonstrated
-- **Programming**: Python, Flask, SQLAlchemy
-- **Web Technologies**: HTML5, CSS3, JavaScript
-- **Database Design**: SQLite database schema design
-- **Problem Solving**: Real-world parking management solution
-- **Documentation**: Comprehensive project documentation
+## Quick Start
 
-### Challenges Faced & Solutions
-- **Database Design**: Learned to design efficient database schemas
-- **User Authentication**: Implemented session-based login system
-- **Real-time Updates**: Managed dynamic parking spot availability
-- **Responsive Design**: Created mobile-friendly interface
-- **Project Organization**: Structured code for maintainability
+1. **Install Dependencies:**
+   ```bash
+   pip install Flask Flask-SQLAlchemy
+   ```
 
-## 📝 Conclusion
+2. **Run the App:**
+   ```bash
+   python main.py
+   ```
 
-This project demonstrates my understanding of web development concepts and my ability to create a functional, user-friendly application. Through this project, I have gained practical experience in:
+3. **Open in Browser:**
+   Go to `http://127.0.0.1:5000/` in your web browser
 
-- Full-stack web development
-- Database design and management
-- User interface design
-- Problem-solving and debugging
-- Project documentation
+4. **Access Admin Panel:**
+   Login with username: `admin`, password: `admin`
 
-The parking management system successfully addresses the real-world problem of parking space management while showcasing various technical skills and concepts learned during my academic journey.
-
----
-
-**Declaration**: This project is submitted as part of my academic curriculum. All code and documentation have been created by me for educational purposes.
