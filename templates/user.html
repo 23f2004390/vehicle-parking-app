@@ -6,6 +6,8 @@
     <title>Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/static/css/user.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
     <!-- Flash Messages -->
@@ -247,11 +249,28 @@
             <span class="status-badge status-{{ booking.status }}">{{ booking.status | capitalize }}</span>
         </div>
         {% endfor %}
+        <!-- ---------chartjs -->
+        
+<!-- ---------chartjs -->
+<div class="card">
+    <h3>Booking Statistics</h3>
+    <div class="chart-container">
+        <canvas id="bookingChart"></canvas>
     </div>
-    <div class="profile-edit" id="profile">
-    <h3>Edit Profile</h3>
+</div>
+
+<div class="card">
+    <h3>Monthly Spending</h3>
+    <div class="chart-container">
+        <canvas id="spendingChart"></canvas>
+    </div>
+</div>
+
+    </div>
     
     <!-- Profile Information Form -->
+    <div class="profile-edit" id="profile">
+    <h3>Edit Profile</h3>
     <form action="/update-profile" method="POST" class="profile-form">
         <div class="form-group">
             <label for="username">Username:</label>
@@ -302,5 +321,62 @@
 </div>
 <script src="{{ url_for('static', filename='js/user.js') }}"></script>
 <script src="{{ url_for('static', filename='js/user_search.js') }}"></script>
+<script>
+    // Initialize charts when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Booking Status Chart
+    const bookingCtx = document.getElementById('bookingChart');
+    if (bookingCtx) {
+        new Chart(bookingCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Active', 'Completed', 'Cancelled'],
+                datasets: [{
+                    data: [
+                        // You'll need to pass these values from your Flask template
+                        {{ bookings | selectattr('status.value', 'equalto', 'active') | list | length }},
+                        {{ bookings | selectattr('status.value', 'equalto', 'completed') | list | length }},
+                        {{ bookings | selectattr('status.value', 'equalto', 'cancelled') | list | length }}
+                    ],
+                    backgroundColor: ['#1548ad', '#28a745', '#dc3545'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // Monthly Spending Chart
+    const spendingCtx = document.getElementById('spendingChart');
+    if (spendingCtx) {
+        new Chart(spendingCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Monthly Spending',
+                    data: [120, 190, 300, 500, 200, 300], // Replace with actual data
+                    borderColor: '#1548ad',
+                    backgroundColor: 'rgba(21, 72, 173, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
 </body>
 </html>

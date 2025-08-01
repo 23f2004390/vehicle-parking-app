@@ -546,10 +546,34 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-bottom: 30px;
-    height: 100vh;
+    height: auto;
+    /* overflow: auto; */
 }
 
 
+/* Chart Styles */
+.chart-container {
+    /* position: relative; */
+    display: flex;
+    height: 300px;
+    margin: 20px 0;
+}
+
+canvas {
+    max-width: 100% !important;
+    height: 300px !important;
+}
+
+/* Specific chart containers */
+#bookingChart {
+    max-width: 400px !important;
+    height: 250px !important;
+}
+
+#spendingChart {
+    max-width: 100% !important;
+    height: 300px !important;
+}
 /* --------------profile section styles---------------- */
 .profile-edit {
     margin-left: 240px;
