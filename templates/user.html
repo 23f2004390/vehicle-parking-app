@@ -45,33 +45,32 @@
                     <h1>Dashboard</h1>
                 </div>
                 <div class="header-icon">
-                    <button>⬇️</button>
-                    <button>☰</button>
+                    <a href="#chartjs" style="text-decoration: none;box-shadow: #1548ad;"><i class="ri-bar-chart-grouped-fill"></i></a>
                 </div>
             </div>
 
             <div class="four-row">
-                <div class="row-card">
-                    <h3>Active Bookings</h3>
-                    <div class="number">{{ bookings | selectattr('status', 'equalto', 'active') | list | length }}</div>
-                    <small>Currently active</small>
-                </div>
-                <div class="row-card">
-                    <h3>Upcoming</h3>
-                    <div class="number">{{ bookings | selectattr('status', 'equalto', 'upcoming') | list | length }}</div>
-                    <small>Next 30 days</small>
-                </div>
-                <div class="row-card">
-                    <h3>Completed</h3>
-                    <div class="number">{{ bookings | selectattr('status', 'equalto', 'completed') | list | length }}</div>
-                    <small>This year</small>
-                </div>
-                <div class="row-card">
-                    <h3>Hours Spent</h3>
-                    <div class="number">{{ bookings | map(attribute='duration') | sum }}</div>
-                    <small>total duration</small>
-                </div>
-            </div>
+    <div class="row-card">
+        <h3>Active Bookings</h3>
+        <div class="number">{{ bookings | selectattr('status.value', 'equalto', 'active') | list | length }}</div>
+        <small style="color: #1b5404;">Currently active</small>
+    </div>
+    <div class="row-card">
+        <h3>Expenditure</h3>
+        <div class="number">₹{{ bookings | sum(attribute='total_cost') | default(0) }}</div>
+        <small style="color: rgb(200, 141, 85)">Total Expenditure</small>
+    </div>
+    <div class="row-card">
+        <h3>Completed</h3>
+        <div class="number">{{ bookings | selectattr('status.value', 'equalto', 'completed') | list | length }}</div>
+        <small>Bookings completed</small>
+    </div>
+    <div class="row-card">
+        <h3>Hours Spent</h3>
+        <div class="number">{{ bookings | map(attribute='duration') | sum }}</div>
+        <small>total duration</small>
+    </div>
+</div>
             <div class="content">
                 <div class="left_column">
                     <div class="card" style="height: 50vh; overflow-y: auto;">
@@ -112,14 +111,33 @@
                             <span>Total Spent</span>
                             <span>₹{{ bookings | map(attribute='total_cost') | sum | round(2) }}</span>
                         </div>
-                        <div class="stat-item">
-                            <span>Loyalty Level</span>
-                            <span style="color: #1548ad;">Silver</span>
+                        
+                        <!-- User Feedback Form -->
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <h4 style="color: #1548ad; margin-bottom: 10px; font-size: 1rem;">Quick Feedback</h4>
+                            <form action="/feedback" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
+                                <textarea 
+                                    name="feedback" 
+                                    placeholder="Share your experience..." 
+                                    rows="2" 
+                                    maxlength="100"
+                                    style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; font-family: Arial, Helvetica, sans-serif; resize: vertical; min-height: 60px;"
+                                    onfocus="this.style.borderColor='#1548ad'; this.style.boxShadow='0 0 0 2px rgba(21, 72, 173, 0.1)';"
+                                    onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';">
+                                </textarea>
+                                <button 
+                                    type="submit" 
+                                    style="background: #1548ad; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: 500; align-self: flex-end; transition: background-color 0.3s;"
+                                    onmouseover="this.style.background='#0d3a8a';"
+                                    onmouseout="this.style.background='#1548ad';">
+                                    Submit
+                                </button>
+                            </form>
                         </div>
-                    </div>
+                    </div>                          
 
                     <div class="card">
-                        <h3>Notifications</h3>
+                        <h3>User info</h3>
                         <div class="activity-item">
                             <div><strong>Name:</strong> {{ user.username }}</div>
                             <div><strong>Email:</strong> {{ user.email }}</div>
@@ -252,7 +270,7 @@
         <!-- ---------chartjs -->
         
 <!-- ---------chartjs -->
-<div class="card">
+<div class="card" id="chartjs">
     <h3>Booking Statistics</h3>
     <div class="chart-container">
         <canvas id="bookingChart"></canvas>
@@ -284,7 +302,7 @@
         
         <div class="form-group">
             <label for="address">Address:</label>
-            <textarea name="address" id="address" placeholder="Enter your address" class="profile-input">{{ user.address if user.address != 'None' else '' }}</textarea>
+            <textarea name="address" id="address" placeholder="Enter your address" class="profile-input">{{ user.address }}</textarea>
         </div>
         
         <!-- Action Buttons for Profile -->
@@ -331,13 +349,12 @@ document.addEventListener('DOMContentLoaded', function() {
         new Chart(bookingCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Active', 'Completed', 'Cancelled'],
+                labels: ['Active', 'Completed'],
                 datasets: [{
                     data: [
                         // You'll need to pass these values from your Flask template
                         {{ bookings | selectattr('status.value', 'equalto', 'active') | list | length }},
                         {{ bookings | selectattr('status.value', 'equalto', 'completed') | list | length }},
-                        {{ bookings | selectattr('status.value', 'equalto', 'cancelled') | list | length }}
                     ],
                     backgroundColor: ['#1548ad', '#28a745', '#dc3545'],
                     borderWidth: 2
