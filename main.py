@@ -266,16 +266,18 @@ def lot_edit():
         
         lot = Parking_lot.query.get(id)
         if lot:
+            old_total_spots = lot.total_spots
             available_spots = lot.available_spots
             lot.prime_location_name = prime_location_name
             lot.address = address
             lot.pin_code = pin_code
-            lot.total_spots = total_spots
-            if total_spots > lot.total_spots:   
-                lot.available_spots = available_spots + abs(total_spots - lot.total_spots)
-            else:
-                lot.available_spots = available_spots - abs(total_spots - lot.total_spots)
             lot.parking_cost = cost
+            spots_difference = total_spots - old_total_spots
+            lot.available_spots = available_spots + spots_difference
+            lot.total_spots = total_spots            
+            if lot.available_spots < 0:
+                lot.available_spots = 0
+            
             db.session.commit()
             flash('Parking lot updated successfully!', 'success')
         else:
