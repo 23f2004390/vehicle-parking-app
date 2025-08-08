@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+        <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/admin.css">
+
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-overlay" onclick="this.remove()">
+                    <div class="flash-message flash-{{ category }}" onclick="event.stopPropagation()">
+                        <p>{{ message }}</p>
+                        <button class="login-btn" onclick="this.closest('.flash-overlay').remove()">OK</button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+    <div class="container">
+        
+        <div class="sidebar" >
+            <div class="profile">
+                <h1 style="border-bottom: 1px solid #d3caca81;">  Admin</h1>
+            </div>
+            <div class="nav">
+                <nav class="nav-item"><a href="#dashboard" class="active">📊 Dashboard</a></nav>
+                <div class="nav-item"><a href="#search-section" class="active">🅿️ Parking Lots</a></div>
+                <div class="nav-item"><a href="javascript:void(0)" onclick="openUsersPopup()" class="active">🙎 User</a></div>
+                <div class="nav-item"><a href="javascript:void(0)" onclick="openBookingPopup()" class="active">📋 Bookings</a></div>
+                <div class="nav-item"><a href="#summary" class="active">📈Summary</a></div>
+                <div class="nav-item"><a href="/logout" class="active"><i class="ri-login-box-fill" style="font-size: 2rem;"></i>Logout</a></div>
+            </div>
+        </div>
+        <div class="main" id="dashboard">
+            <div class="header">
+                <div class="title">
+                <h1>Admin Dashboard </h1>
+                </div>
+                <div class="header-icon">
+                    <button>⬇️</button>
+                    <button>☰</button>
+                </div>
+            </div>
+            <div class="four-row">
+                <div class="row-card">
+                    <div class="card-header">
+                        <div class="card-title">Total Parking Lots</div>
+                        <div class="card-icon">🅿️</div>
+                    </div>
+                        <div class="card-value">{{ parking_lots|length }}</div>
+                    <div class="card-change change-positive">
+                        <!-- <i class="ri-arrow-up-line"></i> -->
+                        {{ (parking_lots | length)}} new lots added this month
+                    </div>
+                </div>
+
+                <div class="row-card">
+                    <div class="card-header">
+                        <div class="card-title">Active Users</div>
+                        <div class="card-icon">👥</div>
+                    </div>
+                    <div class="card-value">{{(users | length)}}</div>
+                    <div class="card-change change-positive">
+                        <!-- <i class="ri-arrow-up-line"></i> -->
+                        {{ (users | length) }} new users registered this month
+                    </div>
+                </div>
+
+                <div class="row-card">
+                    <div class="card-header">
+                        <div class="card-title">Total Revenue</div>
+                        <div class="card-icon">💰</div>
+                    </div>
+                    <div class="card-value">₹{{ bookings | sum(attribute='total_cost') | default(0) }}</div>
+                    <div class="card-change change-positive">
+                        <i class="ri-arrow-up-line"></i>
+                        ₹{{ (bookings | sum(attribute='total_cost') | default(0)) }} earned this month
+                    </div>
+                </div>
+
+                <div class="row-card">
+                    <div class="card-header">
+                        <div class="card-title">Occupancy Rate</div>
+                        <div class="card-icon">📊</div>
+                    </div>
+                    <div class="card-value">
+                        {% set total_spots = parking_lots | sum(attribute='total_spots') %}
+                        {% if total_spots > 0 %}
+                            {{ ((parking_lots|length / total_spots) * 100) | round(2) }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </div>
+                                            <div class="card-change change-negative">
+                            <!-- <i class="ri-arrow-down-line"></i> -->
+                            {% if total_spots > 0 %}
+                                {{ ((parking_lots|length / total_spots) * 100) | round(2) }}% occupancy
+                            {% else %}
+                                0% occupancy
+                            {% endif %}
+                        </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="left_column">
+                    <!-- we can use jinja to show multiple line of content -->
+                    <div class="card">
+                        <h3>Recent Bookings</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Parking Lot</th>
+                                        <th>Duration</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                            
+                                {% for booking in bookings[:5] %}
+                                <tbody>
+                                    <tr>
+                                        <td>{{ booking.user.username }}</td>
+                                        <td>{{  booking.Parking_spot.Parking_lot.prime_location_name}}</td>
+                                        <td>{{ booking.duration }} hours</td>
+                                        <td>₹{{ booking.total_cost }}</td>
+                                        <td><span class="status-badge status-active">{{ booking.status }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Users info</h3>
+                        {% for user in users[:5] %}     
+                        <div class="user">
+                            <div class="user-info">
+                                <p><strong>User ID:</strong> {{ user.id }}</p>
+                                <p><strong>Name:</strong> {{ user.username }}</p>
+                                <p><strong>Email:</strong> {{ user.email }}</p>
+                            </div>
+                            <div class="user-actions">
+                                <button class="action-btn" onclick="openUserEditPopup('{{ user.id }}', '{{ user.username }}', '{{ user.email }}', '{{ user.address }}')">Edit</button>
+                                {%if user.username!='admin'%}
+                                <button class="action-btn" onclick="deleteUser('{{ user.id }}', '{{ user.username }}')">Delete</button>
+                                {%endif%}
+                            </div>
+
+                            <br>
+                        </div>  
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="right_column">
+                    <!-- we have to use jinja2 -->
+                    <div class="card">
+                        <h3>Parking Lot Performance</h3>
+                        {% for lot in parking_lots %}
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>{{ lot.prime_location_name }}</span>
+                                {% set occupied_spots = lot.total_spots - lot.available_spots %}
+                                {% set occupancy_percentage = (occupied_spots / lot.total_spots * 100) if lot.total_spots > 0 else 0 %}
+                                <span>{{ "%.1f"|format(occupancy_percentage) }}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ occupancy_percentage }}%"></div>
+                            </div>
+                            <div class="progress-stats">{{ occupied_spots }}/{{ lot.total_spots }} spots occupied</div>
+                        </div>
+                        {% endfor %}
+                        
+
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-number">{{ parking_lots | length }}</div>
+                                <div class="stat-label">Total Parking Lots</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number">{{ bookings | length }}</div>
+                                <div class="stat-label">Total Bookings</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>feedback</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Feedback</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    {% if user.username!='admin'%}
+                                    <tr>
+                                        <td>{{ user.username}}</td>
+                                        <td>{{ user.feedback }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-search" id="search-section">
+        <!-- Search Section -->
+        <div class="search-container">
+            <h2 class="search-title">Search Parking Lots</h2>
+            <div class="search-controls">
+                <select class="search-dropdown" id="searchBy">
+                    <option value="location">Search by Location</option>
+                    <!-- <option value="user_id">Search by User ID</option> -->
+                    <option value="lot_name">Search by Lot Name</option>
+                </select>
+                <input type="text" class="search-input" id="searchInput" placeholder=" search . . .">
+                <button class="create-lot-btn" onclick="openCreateLotPopup()">
+                    <i class="ri-add-line"></i> Create New Lot
+                </button>
+
+            </div>
+            <div class="example-text">
+                Example: Search parking lots by location, user ID, or lot name. e.g. "cityname like chennai", "user123", "Parking #12"
+            </div>
+        </div>
+
+
+
+        <!-- Search Results Section -->
+        <div class="results-grid" id="resultsGrid">
+                <!-- Parking Lot 1 -->
+                {% for lot in parking_lots %}
+                <div class="parking-lot-card" data-location="{{ lot.address }}" data-name="{{ lot.prime_location_name }}" data-user_id="{{ lot.user_id }}">
+                    <div class="lot-header">
+                        <div class="lot-title">{{ lot.prime_location_name }}</div>
+                        <div class="lot-actions">
+                            <button class="action-btn" onclick="openLotEditPopup('{{ lot.id }}', '{{ lot.prime_location_name }}', '{{ lot.address }}', '{{ lot.pin_code }}', '{{ lot.total_spots }}', '{{ lot.parking_cost }}'); event.stopPropagation();">Edit</button>
+                            <button class="action-btn" onclick="deleteLot('{{ lot.id }}', '{{ lot.prime_location_name }}'); event.stopPropagation();">Delete</button>
+                        </div>
+                    </div>
+                    <div class="lot-info">
+                        <p><strong>Location:</strong> {{ lot.address }}</p>
+                        <p><strong>Occupied:</strong> {{ lot.total_spots - lot.available_spots }} spaces</p>
+                    </div>
+                    <div class="occupancy-bar">
+                        {% set occupied_spots = lot.total_spots - lot.available_spots %}
+                        {% set occupancy_percentage = (occupied_spots / lot.total_spots * 100) if lot.total_spots > 0 else 0 %}
+                        <div class="occupancy-fill" style="width: {{ occupancy_percentage }}%"></div>
+                        <div class="occupancy-label">{{ occupied_spots }}/{{ lot.total_spots }} spots occupied</div>
+                    </div>
+                    <div class="spots-preview" onclick="openBookingPopup('{{ lot.lot_id }}')">
+                        {% for spot in lot.spots %}
+                            {% if not spot.is_occupied %}
+                                <div class="spot available">{{ loop.index }}</div>
+                            {% else %}
+                                <div class="spot occupied">{{ loop.index }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+                
+
+
+                
+            </div>
+        </div>
+    </div>
+<!-- ----------------------------------- -->
+    <div class="container-summary" id="summary">
+        <h2>Summary</h2>
+        <p>Total Parking Lots: {{ parking_lots | length }}</p>
+        <p>Total Users: {{ users | length }}</p>
+        <p>Total Revenue: ₹{{ bookings | sum(attribute='total_cost') | default(0) }}</p>
+        
+        
+    
+        
+        <div class="progress-section">
+            <h3>System Overview</h3>
+            
+            <!-- Overall Occupancy Progress -->
+             {% set total_spots = parking_lots | sum(attribute='total_spots') %}
+            {% set available_spots = parking_lots | sum(attribute='available_spots') %}
+             {% set occupied_spots = total_spots - available_spots %}
+             {% set occupancy_rate = (occupied_spots / total_spots * 100) if total_spots > 0 else 0 %}
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span>Overall Parking Occupancy</span>
+                    <span class="progress-percentage">
+                        {{ "%.1f"|format(occupancy_rate) }}%
+                    </span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ occupancy_rate }}%"></div>
+                </div>
+                <div class="progress-stats">{{ occupied_spots }}/{{ total_spots }} spots occupied</div>
+            </div>
+            
+           
+            
+            <!-- Revenue Progress (Monthly) -->
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span>Monthly Revenue Target</span>
+                    <span class="progress-percentage">
+                        {% set current_revenue = bookings | sum(attribute='total_cost') %}
+                        {% set target_revenue = 1000 %}
+                        {% set revenue_rate = (current_revenue / target_revenue * 100) if target_revenue > 0 else 0 %}
+                        {{ "%.1f"|format(revenue_rate) }}%
+                    </span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill revenue-fill" style="width: {{ revenue_rate if revenue_rate <= 100 else 100 }}%"></div>
+                </div>
+                <div class="progress-stats">₹{{ "%.2f"|format(current_revenue) }}/₹{{ target_revenue }} target</div>
+            </div>
+        </div>
+        <div class="charts-container">
+            <div class="chart-wrapper">
+                <div class="chart-container">
+                    <h3>Booking Status Distribution</h3>
+                    <canvas id="bookingStatusChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-wrapper">
+                <div class="chart-container">
+                    <h3>Revenue by Parking Lot</h3>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-wrapper">
+                <div class="chart-container">
+                    <h3>Occupancy Rate by Lot</h3>
+                    <canvas id="occupancyChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <footer>
+        <p>&copy; {{ year|default(2025) }} Parking Management System</p>
+    </footer>
+<!-- ----------------------------form-------------- -->
+<!-- User Edit  Popup --->
+<div class="popup-overlay" id="userEditPopup">
+    <div class="popup-form">
+        <h3>Edit User</h3>
+        <form id="userEditForm" method="POST" action="/user_edit">
+            <input type="hidden" id="editUserId" name="user_id">
+            
+            <div class="form-group">
+                <label for="editUserName">Name:</label>
+                <input type="text" id="editUserName" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editUserEmail">Email:</label>
+                <input type="email" id="editUserEmail" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="editUserEmail">Address:</label>
+                <input type="text" id="editUserAddress" name="address" value="{{ users.address }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editUserPassword">Password:</label>
+                <input type="password" id="editUserPassword" name="password">
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn">Update User</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('userEditPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-------- Parking  Lot Edit Popup -->
+<div class="popup-overlay" id="lotEditPopup">
+    <div class="popup-form">
+        <h3>Edit Parking Lot</h3>
+        <form id="lotEditForm" method="POST" action="/lot_edit">
+            <input type="hidden" id="editLotId" name="lot_id">
+            
+            <div class="form-group">
+                <label for="editLotName">Prime location name:</label>
+                <input type="text" id="editLotName" name="prime_location_name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editLotLocation">Address:</label>
+                <input type="text" id="editLotLocation" name="address" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editTotalSpaces">pin code:</label>
+                <input type="number" id="editTotalSpaces" name="pin_code" min="100000" required>
+            </div>
+
+            
+            <div class="form-group">
+                <label for="editOccupiedSpaces">total spots:</label>
+                <input type="number" id="editOccupiedSpaces" name="total_spots" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="editLotCost">Cost:</label>
+                <input type="number" id="editLotCost" name="cost" min="0" required>
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn">Update Lot</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('lotEditPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Create Parking Lot Popup -->
+<div class="popup-overlay" id="createLotPopup">
+    <div class="popup-form">
+        <h3>Create New Parking Lot</h3>
+        <form id="createLotForm" method="POST" action="/create_parking_lot">
+            
+            <div class="form-group">
+                <label for="createLotName">prime_location_name:</label>
+                <input type="text" id="createLotName" name="prime_location_name" placeholder="e.g., hari niwas mall" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="createLotLocation">Address:</label>
+                <input type="text" id="createLotLocation" name="address" placeholder="hari niwas mall,income tax main road,patna,bihar pin-800001" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="createTotalSpaces">Pin code:</label>
+                <input type="number" id="createTotalSpaces" name="pin_code" min="800001" max="899999" placeholder="800001" required>
+            </div>
+            <div class="form-group">
+                <label for="createDescription">total spots:</label>
+                <input type="text" id="createDescription" name="total_spots" placeholder="e.g., 20" required>
+            </div>
+
+            <div class="form-group">
+                <label for="createElectricSpots">Electric Spots:</label>
+                <input type="number" id="createElectricSpots" name="electric_spots" value="0" min="0" step="1" placeholder="how many electric spots e.g.: 0" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="createPricePerHour">Price per Hour (₹):</label>
+                <input type="number" id="createPricePerHour" name="price_per_hour" value="25" min="10" step="5" placeholder="75" required>
+            </div>
+            
+            
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn">Create Parking Lot</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('createLotPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Users Management Popup -->
+<div class="popup-overlay" id="usersPopup">
+    <div class="users-popup-content">
+        <div class="users-popup-header">
+            <h2>🙎 Users Management</h2>
+            <button class="close-popup-btn" onclick="closeUsersPopup()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        
+        <div class="users-popup-body">
+            <!-- User Controls Section -->
+            <div class="user-controls">
+                <div class="user-actions-bar">
+                    <div class="user-search">
+                        <select class="search-dropdown" id="userSearchBy">
+                            <option value="name">Search by Name</option>
+                            <option value="email">Search by Email</option>
+                            <option value="user_id">Search by User ID</option>
+                        </select>
+                        <input type="text" class="search-input" id="userSearchInput" placeholder="Search users...">
+                    </div>
+                    <button class="create-user-btn" onclick="openCreateUserPopup()">
+                        <i class="ri-user-add-line"></i> Create New User
+                    </button>
+                </div>
+            </div>
+
+            <!-- Users Grid -->
+            <div class="user-list" id="userGrid">
+                <!--jinja user cards-->
+                {% for user in users %}
+                {%if user.username!="admin" %}
+                <div class="user-card" data-name="{{ user.username }}" data-email="{{ user.email }}" data-userid="{{ user.id }}">
+                    <div class="user-header">
+                        <span class="user-name">{{ user.username }}</span>
+                        <span class="user-id">{{ user.id }}</span>
+                    </div>
+                    <div class="user-info">
+                        <p>Email: <span class="user-email">{{ user.email }}</span></p>
+                        <p>address: <span class="user-phone">{{ user.address }}</span></p>
+                    </div>
+                    <div class="user-actions">
+                        <button class="action-btn" onclick="openUserEditPopup('{{ user.id }}', '{{ user.username }}', '{{ user.email }}', '{{user.password}}','{{ user.address }}')">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteUser('{{ user.id }}', '{{ user.username }}')">Delete</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create User Popup -->
+<div class="popup-overlay" id="createUserPopup">
+    <div class="popup-form">
+        <h3>Create New User</h3>
+        <form id="createUserForm" method="POST" action="/user_create">
+            <div class="form-group">
+                <label for="createUserName">User Name:</label>
+                <input type="text" id="createUserName" name="username" placeholder="e.g., rituraj" required>
+            </div>
+            <div class="form-group">
+                <label for="createUserEmail">Email:</label>
+                <input type="email" id="createUserEmail" name="email" placeholder="mymail@exemple.com" required>
+            </div>
+            <div class="form-group">
+                <label for="createUserAddress">Address:</label>
+                <input type="text" id="createUserAddress" name="address" placeholder="e.g., patna bihar india" required>
+            </div>
+            <div class="form-group">
+                <label for="createUserPassword">Password:</label>
+                <input type="password" id="createUserPassword" name="password" placeholder="Enter password" required>
+            </div>
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn">Create User</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('createUserPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete User Confirmation Popup -->
+<div class="popup-overlay" id="deleteUserPopup">
+    <div class="popup-form">
+        <h3>Delete User</h3>
+        <form id="deleteUserForm" method="POST" action="/user_delete">
+            <input type="hidden" id="deleteUserId" name="user_id">
+            <div class="delete-warning">
+                <i class="ri-alert-line" style="font-size: 3rem; color: #dc3545; margin-bottom: 15px;"></i>
+                <p>Are you sure you want to delete user <strong id="deleteUserName"></strong>?</p>
+                <p style="color: #dc3545; font-size: 0.9rem;">This action cannot be undone.</p>
+            </div>
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn" style="background: #dc3545;">Delete User</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('deleteUserPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Booking Management Popup -->
+<div class="popup-overlay" id="bookingPopup">
+    <div class="booking-popup-content">
+        <div class="booking-popup-header">
+            <h2>📋 Booking Management</h2>
+            <button class="close-popup-btn" onclick="closeBookingPopup()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        
+        <div class="booking-popup-body">
+            <!-- Booking Controls Section -->
+            <div class="booking-controls">
+                <div class="booking-actions-bar">
+                    <div class="booking-search">
+                        <select class="search-dropdown" id="bookingSearchBy">
+                            <option value="all">All Bookings</option>
+                            <option value="active">Active Bookings</option>
+                            <option value="completed">Completed Bookings</option>
+                        </select>
+                        <input type="text" class="search-input" id="bookingSearchInput" placeholder="Search by user ID, lot name...">
+                    </div>
+                    <div class="action-buttons">
+                        <button class="create-user-btn" onclick="openCreateBookingPopup()">
+                            <i class="ri-add-line"></i> Create New Booking
+                        </button>
+                        <form action="/release_all" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger"
+                                onclick="return confirm('Are you sure you want to release all vehicles from all lots?');" style="padding: 5px 20px;background: #8e1010d7;margin-top: 2px; margin-left: 10px;color: #fff;border: none;border-radius: 5px;cursor: pointer;transition: background-color 0.3s ease-in-out;">
+                                Release All
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Stats -->
+            <div class="booking-stats">
+                <div class="stat-card">
+                    <div class="stat-number">{{ bookings | length }}</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ bookings | selectattr('status.value', 'equalto', 'active') | list | length }}</div>
+                    <div class="stat-label">Active Now</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">₹{{ bookings | sum(attribute='total_cost') | default(0) }}</div>
+                    <div class="stat-label">Today's Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ bookings | selectattr('status.value', 'equalto', 'completed') | list | length }}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+            </div>
+
+            <!-- Booking List -->
+            <div class="booking-list" id="bookingGrid">
+                <!--jinja booking cards-->
+                {% for booking in bookings %}
+                <div class="booking-card" data-status="{{ booking.status }}" data-user="{{ booking.user_id }}" data-lot="{{ booking.parking_lot }}">
+                    <div class="booking-header">
+                        <span class="booking-id">{{ booking.id }}</span>
+                        <span class="booking-status status-{{ booking.status }}">{{ booking.status | capitalize }}</span>
+                    </div>
+                    <div class="booking-info">
+                        <p><strong>User:</strong> {{ booking.user.username}}</p>
+                        <p><strong>Parking Lot:</strong> {{ booking.Parking_spot.Parking_lot.prime_location_name }}  [   {{ booking.Parking_spot.Parking_lot.address }} ]</p>
+                        <p><strong>Duration:</strong> {{ booking.duration }} hours (Started: {{ booking.start_time }})</p>
+                        <p><strong>Amount:</strong> ₹{{ booking.total_cost }}</p>
+                        <p><strong>Vehicle_number:</strong> {{ booking.vehicle_number }}</p>
+                        <p><strong>Vehicle type:</strong> {{ booking.vehicle_type }}</p>
+                    </div>
+                    <div class="booking-actions">
+                            {% if booking.status.value == 'active' %}
+                                <form action="/release_booking" method="POST" style="display:inline;">
+                                <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                                <button type="submit" class="action-btn release-btn"
+                                onclick="return confirm('Are you sure you want to release this booking?');">
+                                <i class="ri-logout-box-line"></i> Release Spot
+                                </button>
+                                </form>
+                            {% endif %}
+                    </div>
+                    
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Booking Popup -->
+<div class="popup-overlay" id="createBookingPopup">
+    <div class="popup-form">
+        <h3>Create New Booking</h3>
+        <form id="createBookingForm" method="POST" action="/booking_lot">
+            <div class="form-group">
+                <label for="createBookingUser">User ID:</label>
+                <select id="createBookingUser" name="user_id" required style="width: 100%;padding: 10px;border-radius: 5px;border: 1px solid #ccc;margin-bottom: 10px;">
+                    <option value="">Select User</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="createBookingLot">Parking prime_location_name</label>
+                <select id="createBookingLot" name="spot_id" required style="width: 100%;padding: 10px;border-radius: 5px;border: 1px solid #ccc;margin-bottom: 10px;">
+                    <option value="">Select Parking Lot</option>
+                    {% for lot in parking_lots %}
+                    <option value="{{ lot.id }}">{{ lot.prime_location_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="createBookingDuration">Duration (hours):</label>
+                <input type="number" id="createBookingDuration" name="duration" min="0.5" step="0.5" placeholder="2.5" required>
+            </div>
+            <div class="form-group">
+                <label for="createBookingVehicleNumber">Vehicle Number:</label>
+                <input type="text" id="createBookingVehicleNumber" name="vehicle_number" placeholder="e.g., MH123456" required>
+            </div>
+            <div class="form-group">
+                <label for="createBookingVehicleType">Vehicle Type:</label>
+                <select id="createBookingVehicleType" name="vehicle_type" required style="width: 100%;padding: 10px;border-radius: 5px;border: 1px solid #ccc;margin-bottom: 10px;">
+                    <option value="">Select Vehicle Type</option>
+                    <option value="car">Car</option>
+                    <option value="motorcycle">Motorcycle</option>
+                </select>
+            </div>
+            <div class="form-buttons">
+                <button type="submit" class="submit-btn">Create Booking</button>
+                <button type="button" class="cancel-btn" onclick="closePopup('createBookingPopup')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<form id="deleteLotForm" method="POST" action="/lot_delete" style="display:none;">
+  <input type="hidden" id="deleteLotId" name="lot_id">
+</form>
+
+<!-- chartjs -->
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Booking Status Chart
+    const bookingStatusCtx = document.getElementById('bookingStatusChart').getContext('2d');
+    new Chart(bookingStatusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Active', 'Completed', 'Cancelled'],
+            datasets: [{
+                data: [
+                    {{ bookings | selectattr('status.value', 'equalto', 'active') | list | length }},
+                    {{ bookings | selectattr('status.value', 'equalto', 'completed') | list | length }},
+                    {{ bookings | selectattr('status.value', 'equalto', 'cancelled') | list | length }}
+                ],
+                backgroundColor: ['#007bff', '#28a745', '#dc3545'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for lot in parking_lots %}
+                '{{ lot.prime_location_name }}'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: [
+                    {% for lot in parking_lots %}
+                    {% set lot_revenue = 0 %}
+                    {% for booking in bookings %}
+                        {% if booking.Parking_spot.lot_id == lot.id %}
+                            {% set lot_revenue = lot_revenue + booking.total_cost %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ lot_revenue }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: '#007bff',
+                borderColor: '#0056b3',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    const occupancyCtx = document.getElementById('occupancyChart').getContext('2d');
+    new Chart(occupancyCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for lot in parking_lots %}
+                '{{ lot.prime_location_name }}'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Occupancy %',
+                data: [
+                    {% for lot in parking_lots %}
+                    {% set occupied = lot.total_spots - lot.available_spots %}
+                    {% set occupancy = (occupied / lot.total_spots * 100) if lot.total_spots > 0 else 0 %}
+                    {{ "%.1f"|format(occupancy) }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: '#28a745',
+                borderColor: '#1e7e34',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y', // This makes the bar chart horizontal
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+});
+
+
+</script>
+</body>
+</html>
